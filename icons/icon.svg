@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 史萊姆溫泉 App 圖示：一隻史萊姆泡在溫泉裡 -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fdf3e4"/>
+      <stop offset="1" stop-color="#f3dcc0"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b4e6f0"/>
+      <stop offset="1" stop-color="#6fbfd4"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c8a27a"/>
+      <stop offset="1" stop-color="#8f6a48"/>
+    </linearGradient>
+    <clipPath id="above">
+      <rect x="0" y="0" width="512" height="296"/>
+    </clipPath>
+  </defs>
+
+  <rect width="512" height="512" fill="url(#bg)"/>
+
+  <!-- 蒸氣 -->
+  <g fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity=".85">
+    <path d="M150 170 q-14 -22 0 -44 q14 -22 0 -44"/>
+    <path d="M362 170 q-14 -22 0 -44 q14 -22 0 -44"/>
+  </g>
+
+  <!-- 木製池邊 + 溫泉水 -->
+  <ellipse cx="256" cy="300" rx="200" ry="104" fill="#6f5037"/>
+  <ellipse cx="256" cy="292" rx="200" ry="100" fill="url(#wood)"/>
+  <ellipse cx="256" cy="292" rx="172" ry="80" fill="url(#water)"/>
+  <ellipse cx="190" cy="270" rx="40" ry="12" fill="#ffffff" opacity=".45"/>
+
+  <!-- 史萊姆（下半身泡在水裡） -->
+  <g clip-path="url(#above)">
+    <path d="M166 300 C166 212 206 166 256 166 C306 166 346 212 346 300 Z" fill="#a8e6b8"/>
+    <path d="M166 300 C166 212 206 166 256 166 C306 166 346 212 346 300 Z" fill="none"
+          stroke="#000" stroke-opacity=".06" stroke-width="10"/>
+  </g>
+  <ellipse cx="214" cy="204" rx="16" ry="9" fill="#ffffff" opacity=".85" transform="rotate(-25 214 204)"/>
+  <!-- 頭上小毛巾 -->
+  <rect x="228" y="150" width="56" height="20" rx="6" fill="#ffffff" transform="rotate(-8 256 160)"/>
+  <rect x="228" y="166" width="56" height="5" rx="2" fill="#e7ddd0" transform="rotate(-8 256 160)"/>
+  <!-- 臉 -->
+  <ellipse cx="228" cy="240" rx="8" ry="12" fill="#4a3a30"/>
+  <ellipse cx="284" cy="240" rx="8" ry="12" fill="#4a3a30"/>
+  <ellipse cx="206" cy="264" rx="14" ry="7" fill="#ff8ca0" opacity=".6"/>
+  <ellipse cx="306" cy="264" rx="14" ry="7" fill="#ff8ca0" opacity=".6"/>
+  <path d="M246 258 q10 10 20 0" fill="none" stroke="#4a3a30" stroke-width="4" stroke-linecap="round"/>
+  <!-- 水面波紋 -->
+  <ellipse cx="256" cy="298" rx="100" ry="14" fill="none" stroke="#ffffff" stroke-width="5" opacity=".7"/>
+
+  <!-- 文字 -->
+  <text x="256" y="452" text-anchor="middle"
+        font-family="'Microsoft JhengHei','PingFang TC','Noto Sans TC',sans-serif"
+        font-weight="900" font-size="66" fill="#5a4636" letter-spacing="4">史萊姆溫泉</text>
+</svg>

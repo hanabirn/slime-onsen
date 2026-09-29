@@ -1,0 +1,17 @@
+{
+  "name": "史萊姆溫泉度假村",
+  "short_name": "史萊姆溫泉",
+  "description": "可愛療癒的史萊姆溫泉掛機遊戲，經營你的溫泉度假村！",
+  "lang": "zh-Hant",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6efe4",
+  "theme_color": "#c8a27a",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
