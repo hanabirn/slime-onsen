@@ -1,6 +1,6 @@
 // 史萊姆溫泉度假村 — Service Worker（讓遊戲可以安裝、離線遊玩）
 // ⚠️ 每次更新遊戲內容後，請把 CACHE 的版本號改掉，玩家才會拿到新版。
-const CACHE = 'slime-onsen-v2.1.0';
+const CACHE = 'slime-onsen-v2.2.0';
 
 const ASSETS = [
   './',

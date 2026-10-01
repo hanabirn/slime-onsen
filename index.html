@@ -32,73 +32,151 @@
     touch-action: manipulation;              /* 手機上連點不會觸發雙擊放大 */
     -webkit-tap-highlight-color: transparent;
   }
+  html, body { height: 100%; }
   body {
     margin: 0;
-    min-height: 100vh;
     font-family: "Zen Maru Gothic", "M PLUS Rounded 1c", "PingFang TC", "Microsoft JhengHei", sans-serif;
     color: var(--text);
     background:
       radial-gradient(circle at 20% 10%, #fff7ea 0, transparent 40%),
       repeating-linear-gradient(90deg, #f3e8d8 0 40px, #f6efe4 40px 80px);
-    display: flex;
-    justify-content: center;
-    padding: 20px 16px 40px;
+    overflow: hidden;                 /* 整個遊戲固定在一個畫面裡，不再往下捲 */
     user-select: none;
   }
-  .wrap { width: 100%; max-width: 760px; }
 
-  header { text-align: center; margin-bottom: 14px; }
-  header h1 {
-    margin: 0;
-    font-size: 1.7rem;
-    letter-spacing: .12em;
+  /* ===== 遊戲畫面：上方資訊列 + 溫泉池 + 下方分頁列 ===== */
+  .game {
+    --nav-h: 66px;
+    position: relative; margin: 0 auto;
+    width: 100%; max-width: 560px;
+    height: 100vh; height: 100dvh;   /* dvh：手機網址列縮放時也剛好一個畫面 */
+    display: flex; flex-direction: column;
+    background: linear-gradient(#efe0c9, #e4cfb0);
+    box-shadow: 0 0 0 4px var(--wood-light), 0 0 30px rgba(90,70,54,.25);
   }
-  header h1 span { color: #e98fa2; }
-  .noren {
-    display: flex; justify-content: center; gap: 4px; margin: 0 auto 8px;
-  }
-  .noren i {
-    width: 34px; height: 22px; background: #7fb3c9; border-radius: 0 0 8px 8px;
-    display: block;
-  }
-  .noren i:nth-child(even) { background: #a9cfdc; }
 
-  .stats {
-    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
-    margin-bottom: 14px;
+  /* 上方資訊列 */
+  .hud {
+    display: flex; gap: 8px; padding: 10px 10px 8px;
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
   }
-  .stat {
-    background: var(--soft);
-    border: 3px solid var(--wood-light);
-    border-radius: 18px;
-    padding: 8px 18px;
-    text-align: center;
-    min-width: 150px;
+  .chip {
+    flex: 1 1 0; min-width: 0; display: flex; align-items: center; gap: 6px;
+    background: var(--soft); border: 3px solid var(--wood-light); border-radius: 999px;
+    padding: 3px 12px 3px 5px; box-shadow: 0 3px 0 var(--wood-light);
+  }
+  .chip[hidden] { display: none; }
+  .chip .ci {
+    width: 32px; height: 32px; flex: none; border-radius: 50%; font-size: 1.1rem;
+    display: grid; place-items: center; background: #fff3dc;
+  }
+  .chip.rb .ci { background: #f3e8ff; }
+  .chip.lan .ci { background: #ffe9e4; }
+  .chip .cv { min-width: 0; line-height: 1.15; }
+  .chip b { display: block; font-size: 1.05rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chip small { display: block; font-size: .66rem; opacity: .7; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chip.lan { flex: 0 1 auto; }
+
+  /* 遊戲畫面裡的溫泉池名牌、季節活動 */
+  .pool-title {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 460;
+    background: linear-gradient(#a9714a, #8f5c3a); color: #fff8ec; font-weight: bold; font-size: .9rem;
+    padding: 4px 16px; border-radius: 10px; border: 2px solid #e8c9a0; white-space: nowrap;
+    box-shadow: 0 3px 0 #6f4a2e; letter-spacing: .08em; pointer-events: none;
+  }
+  .season-chip {
+    position: absolute; top: 44px; left: 50%; transform: translateX(-50%); z-index: 460;
+    font-size: .66rem; padding: 2px 10px; border-radius: 999px; white-space: nowrap; pointer-events: none;
+    background: rgba(255,244,232,.9); border: 1.5px solid #f0b27a; color: #b8662a;
+    max-width: calc(100% - 150px); overflow: hidden; text-overflow: ellipsis;
+  }
+  .season-chip[hidden] { display: none; }
+
+  /* 左右兩側的圓形按鈕 */
+  .side {
+    position: absolute; top: 12px; z-index: 650;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .side-l { left: 12px; }
+  .side-r { right: 12px; }
+  .pool-btn { position: relative; }
+  .pool-btn .plv {
+    position: absolute; bottom: -7px; left: 50%; transform: translateX(-50%);
+    font-size: .56rem; font-weight: bold; white-space: nowrap; line-height: 1.4;
+    background: var(--soft); border: 1.5px solid var(--wood-light); border-radius: 8px; padding: 0 5px;
+  }
+  .pool-btn.active { border-color: #e98fa2; box-shadow: 0 4px 0 #c96f83, 0 0 0 3px rgba(233,143,162,.35); }
+  .pool-btn.locked { filter: grayscale(.7); opacity: .85; }
+
+  /* 下方分頁列 */
+  .nav {
+    height: var(--nav-h); flex: none; display: flex; gap: 4px;
+    padding: 6px 8px; padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    box-sizing: content-box;
+    background: linear-gradient(#a9714a, #8a5a38); border-top: 3px solid #e8c9a0;
+    position: relative; z-index: 720;
+  }
+  .nav-btn {
+    position: relative; flex: 1 1 0; min-width: 0; cursor: pointer;
+    font: inherit; color: #fff8ec; background: rgba(255,255,255,.08);
+    border: 2px solid transparent; border-radius: 14px; padding: 4px 2px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  }
+  .nav-btn i { font-style: normal; font-size: 1.45rem; line-height: 1; }
+  .nav-btn span { font-size: .7rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  .nav-btn.on { background: var(--soft); color: var(--text); border-color: #e8c9a0; transform: translateY(-6px); box-shadow: 0 4px 0 #6f4a2e; }
+  .nav-btn .ndot {
+    position: absolute; top: 2px; right: calc(50% - 22px); width: 12px; height: 12px;
+    background: #ff7b93; border: 2px solid #fff; border-radius: 50%;
+  }
+  .nav-btn .ndot[hidden] { display: none; }
+
+  /* 從下方滑出的面板 */
+  .sheet {
+    position: absolute; left: 0; right: 0; z-index: 710;
+    bottom: calc(var(--nav-h) + 12px + env(safe-area-inset-bottom, 0px));
+    max-height: 62%; display: flex; flex-direction: column;   /* 高度跟著內容，最高 62% */
+    background: var(--bg); border: 4px solid var(--wood-light); border-bottom: none;
+    border-radius: 26px 26px 0 0; box-shadow: 0 -8px 24px rgba(90,70,54,.25);
+    transform: translateY(110%); visibility: hidden;
+    transition: transform .3s cubic-bezier(.3,1.2,.5,1), visibility 0s .3s;
+  }
+  .sheet.open { transform: none; visibility: visible; transition: transform .3s cubic-bezier(.3,1.2,.5,1); }
+  .sheet-head {
+    display: flex; align-items: baseline; gap: 10px; padding: 12px 56px 8px 18px;
+    border-bottom: 2px dashed var(--wood-light);
+  }
+  .sheet-head h2 { margin: 0; font-size: 1.05rem; letter-spacing: .08em; }
+  .sheet-head small { opacity: .7; font-size: .76rem; }
+  .sheet-close {
+    position: absolute; top: 8px; right: 10px; width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+    font: inherit; font-size: 1rem; color: var(--text); background: #fff; border: 2px solid var(--wood-light);
     box-shadow: 0 3px 0 var(--wood-light);
   }
-  .stat small { display: block; font-size: .78rem; opacity: .7; }
-  .stat b { font-size: 1.4rem; }
+  .sheet-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 12px 14px 18px; overscroll-behavior: contain; }
+  .pane { display: none; }
+  .pane.on { display: block; }
 
   /* ===== 溫泉池 ===== */
   .pool-frame {
-    position: relative;
+    position: relative; flex: 1; min-height: 0; margin: 0 10px 12px;
     background: linear-gradient(var(--wood), var(--wood-dark));
-    border-radius: 36px;
-    padding: 16px;
-    box-shadow: 0 8px 0 #6f5037, 0 14px 24px rgba(90,70,54,.25);
+    border-radius: 30px;
+    padding: 10px;
+    box-shadow: 0 6px 0 #6f5037, 0 10px 20px rgba(90,70,54,.25);
   }
   .pool-frame::before, .pool-frame::after {
     content: ""; position: absolute; width: 38px; height: 38px;
     background: #9b9186; border-radius: 45% 55% 50% 50%;
     box-shadow: inset -4px -4px 0 rgba(0,0,0,.12);
   }
-  .pool-frame::before { top: -10px; left: 26px; }
+  .pool-frame::before { display: none; }   /* 左上角的石頭會壓到資訊列，拿掉 */
   .pool-frame::after { bottom: -8px; right: 40px; width: 50px; height: 32px; }
 
   #pool {
     position: relative;
-    height: 320px;
-    border-radius: 26px;
+    height: 100%;
+    border-radius: 22px;
     overflow: hidden;
     cursor: pointer;
     background:
@@ -168,27 +246,8 @@
     filter: drop-shadow(0 0 6px rgba(180,230,255,.9));
   }
 
-  /* 溫泉池分頁（木牌） */
-  .pool-tabs { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
-  .tab {
-    flex: 1 1 150px; font: inherit; color: var(--text); cursor: pointer;
-    background: linear-gradient(#f3e2cb, #e2c6a2);
-    border: 3px solid var(--wood); border-radius: 16px 16px 10px 10px;
-    padding: 8px 10px; box-shadow: 0 4px 0 var(--wood-dark);
-    transition: transform .1s, box-shadow .1s;
-    text-align: center;
-  }
-  .tab b { display: block; font-size: .95rem; }
-  .tab small { font-size: .74rem; opacity: .75; }
-  @media (hover: hover) { .tab:hover { transform: translateY(-2px); box-shadow: 0 6px 0 var(--wood-dark); } }
-  .tab.active {
-    background: var(--soft); border-color: #e98fa2;
-    transform: translateY(2px); box-shadow: 0 2px 0 var(--wood-dark);
-  }
-  .tab.locked { filter: grayscale(.5); opacity: .85; }
-
   .lock-overlay {
-    position: absolute; inset: 16px; border-radius: 26px; z-index: 600;
+    position: absolute; inset: 10px; border-radius: 22px; z-index: 600;
     background: rgba(255,250,243,.82); backdrop-filter: blur(3px);
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     text-align: center; gap: 6px; padding: 16px;
@@ -205,16 +264,11 @@
   .lock-overlay button:disabled { background: #cbbfb3; box-shadow: 0 4px 0 #a99d91; cursor: not-allowed; }
   .lock-overlay button:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 #c96f83; }
 
-  /* 右上角圓形按鈕列（每日獎勵 / 設定 / 音樂） */
-  .top-btns {
-    position: fixed; z-index: 700;
-    top: calc(14px + env(safe-area-inset-top, 0px)); right: 14px;
-    display: flex; gap: 10px;
-  }
+  /* 圓形按鈕（遊戲畫面左右兩側） */
   .round-btn {
     position: relative;
-    width: 56px; height: 56px; border-radius: 50%; cursor: pointer;
-    font-size: 1.5rem; line-height: 1; color: var(--text);
+    width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
+    font-size: 1.35rem; line-height: 1; color: var(--text);
     background: radial-gradient(circle at 35% 30%, #fffaf3, #f0dcc2);
     border: 3px solid var(--wood); box-shadow: 0 4px 0 var(--wood-dark), 0 6px 12px rgba(90,70,54,.2);
     display: grid; place-items: center; padding: 0;
@@ -231,8 +285,8 @@
 
   /* 音樂開關 */
   .music-btn {
-    width: 56px; height: 56px; border-radius: 50%; cursor: pointer;
-    font-size: 1.5rem; line-height: 1; color: var(--text);
+    width: 50px; height: 50px; border-radius: 50%; cursor: pointer;
+    font-size: 1.35rem; line-height: 1; color: var(--text);
     background: radial-gradient(circle at 35% 30%, #fffaf3, #f0dcc2);
     border: 3px solid var(--wood); box-shadow: 0 4px 0 var(--wood-dark), 0 6px 12px rgba(90,70,54,.2);
     display: grid; place-items: center;
@@ -248,7 +302,7 @@
   }
   .music-btn.waiting { animation: pulse 1.4s ease-in-out infinite; }
   .music-btn .label {
-    position: absolute; top: 60px; right: 0; white-space: nowrap;
+    position: absolute; top: 2px; right: 58px; white-space: nowrap;
     font-size: .7rem; background: var(--soft); border: 2px solid var(--wood-light);
     border-radius: 10px; padding: 2px 8px; pointer-events: none;
   }
@@ -262,9 +316,13 @@
     50% { box-shadow: 0 4px 0 var(--wood-dark), 0 0 0 10px rgba(233,143,162,0); }
   }
   .hint {
-    position: absolute; bottom: 10px; width: 100%; text-align: center;
-    font-size: .8rem; color: #fff; opacity: .9; pointer-events: none;
-    text-shadow: 0 1px 2px rgba(0,0,0,.2);
+    position: absolute; bottom: 12px; width: 100%; text-align: center; z-index: 455;
+    font-size: .78rem; color: #fff; opacity: .95; pointer-events: none; line-height: 1.5;
+    text-shadow: 0 1px 2px rgba(0,0,0,.25);
+  }
+  .hint b {
+    display: inline-block; margin-top: 3px; font-size: .78rem; padding: 2px 12px; border-radius: 999px;
+    background: rgba(90,60,40,.35); text-shadow: none;
   }
 
   /* 蒸氣 */
@@ -296,6 +354,8 @@
     white-space: nowrap; z-index: 450;
   }
   @keyframes floatUp { to { transform: translate(-50%, -150%); opacity: 0; } }
+  .float-txt.crit { font-size: 1.7rem; color: #ffe1ec; text-shadow: 0 2px 0 #e0607e, 0 0 10px rgba(255,120,160,.6); }
+  .float-txt.auto { font-size: .9rem; opacity: .9; }
 
   /* ===== 史萊姆 ===== */
   .slime {
@@ -387,8 +447,7 @@
   }
 
   /* ===== 升級 ===== */
-  h2 { font-size: 1.05rem; margin: 26px 0 10px; letter-spacing: .1em; }
-  .shop { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .shop { display: grid; grid-template-columns: 1fr; gap: 10px; }
   .item {
     display: flex; gap: 12px; align-items: center; text-align: left;
     background: var(--soft);
@@ -403,6 +462,7 @@
   }
   .item:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--wood-light); }
   .item:disabled { opacity: .55; cursor: not-allowed; }
+  .item.maxed .cost { color: #7fb3a0; }
   .item .icon {
     font-size: 2rem; width: 52px; height: 52px; flex: none;
     display: grid; place-items: center;
@@ -450,8 +510,8 @@
   .slime.leaving { opacity: 0; transform: translateY(20px); transition: opacity .8s, transform .8s; }
 
   .toast {
-    position: absolute; top: 12px; left: 50%; transform: translate(-50%, -20px);
-    background: #fff8df; border: 3px solid #f1cf73; color: #9a6b12;
+    position: absolute; top: 76px; left: 50%; transform: translate(-50%, -20px);
+    background: #fff8df; max-width: calc(100% - 140px); overflow: hidden; text-overflow: ellipsis; border: 3px solid #f1cf73; color: #9a6b12;
     padding: 6px 16px; border-radius: 16px; font-weight: bold; font-size: .9rem;
     white-space: nowrap; opacity: 0; z-index: 500; pointer-events: none;
     transition: opacity .3s, transform .3s cubic-bezier(.3,1.6,.6,1);
@@ -461,7 +521,7 @@
   /* ===== 圖鑑 ===== */
   .dex-head { display: flex; justify-content: space-between; align-items: baseline; }
   .dex-head small { opacity: .7; }
-  .dex { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .dex { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
   .dex-card {
     background: var(--soft); border: 3px solid var(--wood-light); border-radius: 20px;
     padding: 14px 10px 12px; text-align: center; box-shadow: 0 4px 0 var(--wood-light);
@@ -485,7 +545,6 @@
   .dex-card .rarity { font-size: .72rem; color: #c9803a; }
   .dex-card .count { font-size: .78rem; opacity: .75; margin-top: 4px; }
 
-  footer { text-align: center; margin-top: 24px; font-size: .75rem; opacity: .6; }
 
   /* ===== 彈窗 ===== */
   .modal-bg {
@@ -599,7 +658,7 @@
   }
 
   /* ===== 成就 ===== */
-  .ach-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .ach-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
   .ach {
     display: flex; gap: 12px; align-items: center;
     background: var(--soft); border: 3px solid var(--wood-light); border-radius: 20px;
@@ -654,15 +713,6 @@
     margin-top: 8px; padding-top: 8px; border-top: 2px dashed var(--wood-light);
     font-size: .74rem; opacity: .8; line-height: 1.6;
   }
-
-  /* ===== 標題下的徽章（季節活動 / 祭典燈籠）===== */
-  .header-badges { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
-  .badge {
-    font-size: .76rem; padding: 3px 12px; border-radius: 999px;
-    background: var(--soft); border: 2px solid var(--wood-light);
-  }
-  .badge.season { border-color: #f0b27a; color: #b8662a; background: #fff4e8; }
-  .badge.lantern { border-color: #f09a8a; color: #b8483a; background: #fff0ec; }
 
   /* ===== 季節特效 ===== */
   .season-fx { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
@@ -724,8 +774,8 @@
   }
 
   /* ===== 史萊姆之家 ===== */
-  .section-tip { font-size: .78rem; opacity: .7; margin: -4px 0 10px; }
-  .house { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+  .section-tip { font-size: .78rem; opacity: .7; margin: 0 0 10px; }
+  .house { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
   .house-card {
     font: inherit; color: inherit; cursor: pointer; text-align: center;
     background: var(--soft); border: 3px solid var(--wood-light); border-radius: 18px;
@@ -845,65 +895,31 @@
 
   /* ===== 手機版 ===== */
   @media (max-width: 640px) {
-    body { padding: 12px 12px 28px; }
-    header { margin-top: 54px; }              /* 讓出右上角按鈕的位置 */
-    header h1 { font-size: 1.3rem; letter-spacing: .06em; }
-    .top-btns { gap: 8px; right: 10px; top: calc(10px + env(safe-area-inset-top, 0px)); }
-    .round-btn { width: 46px; height: 46px; font-size: 1.2rem; }
-    .music-btn .label { top: 50px; }
-
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .stat { min-width: 0; padding: 6px 8px; border-radius: 14px; }
-    .stat small { font-size: .7rem; }
-    .stat b { font-size: 1.15rem; }
-
-    .pool-tabs { flex-wrap: nowrap; gap: 6px; }
-    .tab { flex: 1 1 0; min-width: 0; padding: 7px 4px; border-radius: 12px 12px 8px 8px; min-height: 52px; }
-    .tab b { font-size: .78rem; }
-    .tab small { font-size: .64rem; display: block; }
-
-    .pool-frame { padding: 10px; border-radius: 28px; }
-    #pool { height: 270px; border-radius: 20px; }
-    .lock-overlay { inset: 10px; border-radius: 20px; }
-
-    h2 { font-size: .98rem; margin: 20px 0 8px; }
-    .shop { grid-template-columns: 1fr; gap: 10px; }
-    .item { padding: 10px 12px; min-height: 76px; }
-    .item .icon { width: 46px; height: 46px; font-size: 1.7rem; }
-    .dex { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .ach-list { grid-template-columns: 1fr; gap: 10px; }
-    .festival { padding: 12px; gap: 10px; }
-    .fest-info { min-width: 0; flex-basis: calc(100% - 80px); }
-    .fest-btn { width: 100%; }
-    .house { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .badge { font-size: .7rem; }
-
+    .game { box-shadow: none; }
     .modal { padding: 20px 18px; border-radius: 22px; }
     .stamps { gap: 3px; }
     .stamp { font-size: .6rem; border-radius: 9px; }
     .stamp i { font-size: 1rem; }
     .set-row { flex-wrap: wrap; }
+    .festival { padding: 12px; gap: 10px; }
+    .fest-info { min-width: 0; flex-basis: calc(100% - 80px); }
+    .fest-btn { width: 100%; }
   }
   @media (max-width: 360px) {
-    .tab b { font-size: .7rem; }
-    .stat b { font-size: 1rem; }
+    .round-btn, .music-btn { width: 44px; height: 44px; font-size: 1.15rem; }
+    .chip { padding-right: 8px; }
+    .chip b { font-size: .95rem; }
+    .nav-btn span { font-size: .62rem; }
+  }
+  /* 很矮的畫面（手機橫放）：面板拉高一點 */
+  @media (max-height: 560px) {
+    .sheet { max-height: 78%; }
   }
 </style>
 </head>
 <body>
 <!-- 背景音樂：bgm.mp3 需與此 html 放在同一個資料夾 -->
 <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
-<div class="top-btns">
-  <button class="round-btn" id="gift-btn" data-i18n-attr="aria-label,title:btn.gift">
-    🎁<span class="dot" id="gift-dot" hidden></span>
-  </button>
-  <button class="round-btn" id="gear-btn" data-i18n-attr="aria-label,title:btn.settings"><span>⚙️</span></button>
-  <button class="round-btn music-btn" id="music-btn" data-i18n-attr="aria-label:btn.music">
-    <span class="note">♪</span>
-    <span class="label" data-i18n="music.tapToStart"></span>
-  </button>
-</div>
-
 <!-- 設定視窗 -->
 <div class="modal-bg" id="settings-bg" hidden>
   <div class="modal settings" role="dialog" data-i18n-attr="aria-label:btn.settings">
@@ -977,26 +993,31 @@
   </div>
 </div>
 
-<div class="wrap">
-  <header>
-    <div class="noren"><i></i><i></i><i></i><i></i><i></i></div>
-    <h1 data-i18n-html="h1">♨ 史萊姆<span>溫泉</span>度假村 ♨</h1>
-    <div class="header-badges">
-      <span class="badge season" id="season-badge" hidden></span>
-      <span class="badge lantern" id="lantern-badge" hidden></span>
+<div class="game" id="game">
+  <!-- 上方資訊列：溫泉幣 / 彩虹金幣 / 祭典燈籠 -->
+  <div class="hud">
+    <div class="chip coin">
+      <span class="ci">💰</span>
+      <div class="cv"><b id="coins">0</b><small id="cps-label"></small></div>
     </div>
-  </header>
-
-  <div class="stats">
-    <div class="stat"><small data-i18n="stat.coins"></small><b id="coins">0</b></div>
-    <div class="stat"><small data-i18n="stat.cps"></small><b id="cps">0</b></div>
-    <div class="stat"><small data-i18n="stat.cpc"></small><b id="cpc">0</b></div>
-    <div class="stat"><small id="rainbow-label"></small><b id="rainbow">0</b></div>
+    <div class="chip rb">
+      <span class="ci">🌈</span>
+      <div class="cv"><b id="rainbow">0</b><small id="rps-label"></small></div>
+    </div>
+    <div class="chip lan" id="lantern-chip" hidden>
+      <span class="ci">🏮</span>
+      <div class="cv"><b id="lantern-count">0</b><small id="lantern-bonus"></small></div>
+    </div>
   </div>
 
-  <div class="pool-tabs" id="pool-tabs"></div>
-
+  <!-- 遊戲畫面：溫泉池佔滿中間 -->
   <div class="pool-frame">
+    <div id="pool">
+      <div class="fx" id="fx"></div>
+      <div class="pool-title" id="pool-title"></div>
+      <div class="season-chip" id="season-badge" hidden></div>
+      <div class="hint"><span data-i18n="pool.hint"></span><br><b id="pool-stats"></b></div>
+    </div>
     <div class="toast" id="toast"></div>
     <div class="lock-overlay" id="lock-overlay" hidden>
       <div class="big" id="lock-icon">🔒</div>
@@ -1004,97 +1025,153 @@
       <p id="lock-desc"></p>
       <button id="unlock-btn"></button>
     </div>
-    <div id="pool">
-      <div class="fx" id="fx"></div>
-      <div class="hint" data-i18n="pool.hint"></div>
+    <!-- 左側：切換溫泉池 -->
+    <div class="side side-l" id="pool-tabs"></div>
+    <!-- 右側：設定 / 音樂 / 每日獎勵 -->
+    <div class="side side-r top-btns">
+      <button class="round-btn" id="gear-btn" data-i18n-attr="aria-label,title:btn.settings"><span>⚙️</span></button>
+      <button class="round-btn music-btn" id="music-btn" data-i18n-attr="aria-label:btn.music">
+        <span class="note">♪</span>
+        <span class="label" data-i18n="music.tapToStart"></span>
+      </button>
+      <button class="round-btn" id="gift-btn" data-i18n-attr="aria-label,title:btn.gift">
+        🎁<span class="dot" id="gift-dot" hidden></span>
+      </button>
     </div>
   </div>
 
-  <h2 data-i18n="shop.title"></h2>
-  <div class="shop">
-    <button class="item" id="buy-pool">
-      <div class="icon" id="pool-icon">🏞️</div>
-      <div class="info">
-        <div class="name" id="pool-upg-name"></div>
-        <div class="desc" id="pool-upg-desc"></div>
-        <div class="cost">💰 <span id="cost-pool">0</span></div>
-      </div>
-      <div class="lv">Lv.<span id="lv-pool">0</span></div>
-    </button>
-    <button class="item" id="buy-duck">
-      <div class="icon">🐤</div>
-      <div class="info">
-        <div class="name" data-i18n="upg.duck"></div>
-        <div class="desc" data-i18n="upg.duckDesc"></div>
-        <div class="cost">💰 <span id="cost-duck">0</span></div>
-      </div>
-      <div class="lv">×<span id="lv-duck">0</span></div>
-    </button>
-    <button class="item" id="buy-snack">
-      <div class="icon">🍡</div>
-      <div class="info">
-        <div class="name" data-i18n="upg.snack"></div>
-        <div class="desc" data-i18n="upg.snackDesc"></div>
-        <div class="cost">💰 <span id="cost-snack">0</span></div>
-      </div>
-      <div class="lv">Lv.<span id="lv-snack">0</span></div>
-    </button>
-    <button class="item" id="buy-chair">
-      <div class="icon">💺</div>
-      <div class="info">
-        <div class="name" data-i18n="upg.chair"></div>
-        <div class="desc" data-i18n="upg.chairDesc"></div>
-        <div class="cost rainbow">🌈 <span id="cost-chair">0</span></div>
-      </div>
-      <div class="lv">Lv.<span id="lv-chair">0</span></div>
-    </button>
-  </div>
-
-  <h2 data-i18n="fest.title"></h2>
-  <div class="festival" id="festival">
-    <div class="fest-lanterns" id="fest-lanterns"></div>
-    <div class="fest-info">
-      <div id="fest-line1"></div>
-      <div class="fest-sub" id="fest-line2"></div>
-      <div class="fest-sub" id="fest-next"></div>
+  <!-- 從下方滑出的面板（升級 / 小屋 / 圖鑑 / 成就 / 溫泉祭）-->
+  <div class="sheet" id="sheet" aria-hidden="true">
+    <div class="sheet-head">
+      <h2 id="sheet-title"></h2>
+      <small id="sheet-sub"></small>
+      <button class="sheet-close" id="sheet-close" data-i18n-attr="aria-label,title:close">✕</button>
     </div>
-    <button class="fest-btn" id="fest-btn" data-sfx="own" data-i18n="fest.btn"></button>
+    <div class="sheet-body" id="sheet-body">
+      <section class="pane" data-pane="shop">
+        <div class="shop">
+          <button class="item" id="buy-pool">
+            <div class="icon" id="pool-icon">🏞️</div>
+            <div class="info">
+              <div class="name" id="pool-upg-name"></div>
+              <div class="desc" id="pool-upg-desc"></div>
+              <div class="cost">💰 <span id="cost-pool">0</span></div>
+            </div>
+            <div class="lv">Lv.<span id="lv-pool">0</span></div>
+          </button>
+          <button class="item" id="buy-duck">
+            <div class="icon">🐤</div>
+            <div class="info">
+              <div class="name" data-i18n="upg.duck"></div>
+              <div class="desc" data-i18n="upg.duckDesc"></div>
+              <div class="cost">💰 <span id="cost-duck">0</span></div>
+            </div>
+            <div class="lv">×<span id="lv-duck">0</span></div>
+          </button>
+          <button class="item" id="buy-helper">
+            <div class="icon">🧹</div>
+            <div class="info">
+              <div class="name" data-i18n="upg.helper"></div>
+              <div class="desc" data-i18n="upg.helperDesc"></div>
+              <div class="cost">💰 <span id="cost-helper">0</span></div>
+            </div>
+            <div class="lv">Lv.<span id="lv-helper">0</span></div>
+          </button>
+          <button class="item" id="buy-milk">
+            <div class="icon">🥛</div>
+            <div class="info">
+              <div class="name" data-i18n="upg.milk"></div>
+              <div class="desc" data-i18n="upg.milkDesc"></div>
+              <div class="cost">💰 <span id="cost-milk">0</span></div>
+            </div>
+            <div class="lv">Lv.<span id="lv-milk">0</span></div>
+          </button>
+          <button class="item" id="buy-snack">
+            <div class="icon">🍡</div>
+            <div class="info">
+              <div class="name" data-i18n="upg.snack"></div>
+              <div class="desc" data-i18n="upg.snackDesc"></div>
+              <div class="cost">💰 <span id="cost-snack">0</span></div>
+            </div>
+            <div class="lv">Lv.<span id="lv-snack">0</span></div>
+          </button>
+          <button class="item" id="buy-lure">
+            <div class="icon">🏮</div>
+            <div class="info">
+              <div class="name" data-i18n="upg.lure"></div>
+              <div class="desc" data-i18n="upg.lureDesc"></div>
+              <div class="cost">💰 <span id="cost-lure">0</span></div>
+            </div>
+            <div class="lv">Lv.<span id="lv-lure">0</span></div>
+          </button>
+          <button class="item" id="buy-chair">
+            <div class="icon">💺</div>
+            <div class="info">
+              <div class="name" data-i18n="upg.chair"></div>
+              <div class="desc" data-i18n="upg.chairDesc"></div>
+              <div class="cost rainbow">🌈 <span id="cost-chair">0</span></div>
+            </div>
+            <div class="lv">Lv.<span id="lv-chair">0</span></div>
+          </button>
+          <button class="item" id="buy-bamboo">
+            <div class="icon">🎋</div>
+            <div class="info">
+              <div class="name" data-i18n="upg.bamboo"></div>
+              <div class="desc" data-i18n="upg.bambooDesc"></div>
+              <div class="cost rainbow">🌈 <span id="cost-bamboo">0</span></div>
+            </div>
+            <div class="lv">Lv.<span id="lv-bamboo">0</span></div>
+          </button>
+        </div>
+      </section>
+
+      <section class="pane" data-pane="house">
+        <p class="section-tip" data-i18n="house.tip"></p>
+        <div class="house" id="house"></div>
+      </section>
+
+      <section class="pane" data-pane="dex">
+        <div class="dex" id="dex"></div>
+      </section>
+
+      <section class="pane" data-pane="ach">
+        <div class="ach-list" id="ach-list"></div>
+      </section>
+
+      <section class="pane" data-pane="fest">
+        <div class="festival" id="festival">
+          <div class="fest-lanterns" id="fest-lanterns"></div>
+          <div class="fest-info">
+            <div id="fest-line1"></div>
+            <div class="fest-sub" id="fest-line2"></div>
+            <div class="fest-sub" id="fest-next"></div>
+          </div>
+          <button class="fest-btn" id="fest-btn" data-sfx="own" data-i18n="fest.btn"></button>
+        </div>
+      </section>
+    </div>
   </div>
 
-  <div class="dex-head">
-    <h2 data-i18n="house.title"></h2>
-    <small id="house-pool"></small>
-  </div>
-  <p class="section-tip" data-i18n="house.tip"></p>
-  <div class="house" id="house"></div>
-
-  <div class="dex-head">
-    <h2 data-i18n="dex.title"></h2>
-    <small id="dex-count"></small>
-  </div>
-  <div class="dex" id="dex"></div>
-
-  <div class="dex-head">
-    <h2 data-i18n="ach.title"></h2>
-    <small id="ach-count"></small>
-  </div>
-  <div class="ach-list" id="ach-list"></div>
-
-  <footer data-i18n="footer"></footer>
+  <!-- 下方分頁列 -->
+  <nav class="nav" id="nav">
+    <button class="nav-btn" data-pane="shop"><i>🛠</i><span data-i18n="nav.shop"></span><b class="ndot" hidden></b></button>
+    <button class="nav-btn" data-pane="house"><i>🏠</i><span data-i18n="nav.house"></span><b class="ndot" hidden></b></button>
+    <button class="nav-btn" data-pane="dex"><i>📖</i><span data-i18n="nav.dex"></span><b class="ndot" hidden></b></button>
+    <button class="nav-btn" data-pane="ach"><i>🏆</i><span data-i18n="nav.ach"></span><b class="ndot" hidden></b></button>
+    <button class="nav-btn" data-pane="fest"><i>🏮</i><span data-i18n="nav.fest"></span><b class="ndot" hidden></b></button>
+  </nav>
 </div>
 
 <script>
 (() => {
   const SAVE_KEY = 'slimeOnsenSave_v1';
-  const OFFLINE_CAP_SEC = 8 * 60 * 60;  // 離線收益最多計算 8 小時
-  const VERSION = '2.1.0';
+  const VERSION = '2.2.0';
 
   // ===== 多語言 =====
   // 字串裡的 {名稱} 會被替換成參數；找不到的字串會退回繁體中文。
   const I18N = {
     zh: {
       'title': '史萊姆溫泉度假村',
-      'h1': '♨ 史萊姆<span>溫泉</span>度假村 ♨',
       'btn.gift': '每日登入獎勵', 'btn.settings': '遊戲設定', 'btn.music': '背景音樂開關',
       'music.tapToStart': '點一下開始音樂', 'music.missing': '找不到 bgm.mp3',
       'music.pause': '暫停音樂', 'music.play': '播放音樂',
@@ -1110,6 +1187,18 @@
       'about.ver': '版本 {v} · 開業日 {d}',
       'about.credit': '🎵 背景音樂：「Japanese Calm Piano」<br>作曲：pianocafe_kumi · 來源：Pixabay',
       'close': '關閉',
+      'hud.perSec': '+{n}/秒', 'hud.bonus': '收益 +{p}%',
+      'pool.stats': '每秒 +{ps} · 每次 +{pc}', 'nav.shop': '升級',
+      'nav.house': '小屋', 'nav.dex': '圖鑑',
+      'nav.ach': '成就', 'nav.fest': '溫泉祭',
+      'crit': '暴擊！', 'upg.helper': '打掃小幫手',
+      'upg.helperDesc': '每級每秒自動幫你撈 1 次溫泉，離線時也會幫忙', 'upg.milk': '溫泉牛奶販賣機',
+      'upg.milkDesc': '每級 +3% 機率暴擊，那一次撈取 ×10（最高 Lv.10）', 'upg.lure': '招客大燈籠',
+      'upg.lureDesc': '稀有史萊姆出現機率 +25%、停留時間 +2 秒（最高 Lv.8）', 'upg.bamboo': '源泉竹筒',
+      'upg.bambooDesc': '每級離線收益上限 +1 小時（原本 8 小時，最高 Lv.16）', 'say.helper': '小幫手來打掃囉！🧹',
+      'say.milk': '咕嘟咕嘟…溫泉牛奶最棒了！🥛', 'say.lure': '燈籠好亮，客人都來了！✨',
+      'say.bamboo': '源泉流進來了～好暖！🎋', 'tut.navTitle': '📋 下方選單',
+      'tut.nav': '升級、史萊姆小屋、圖鑑、成就、溫泉祭都在這裡。點一下會從下面滑出來，再點一次就收起來。',
       'save.exportMsg': '請把這串存檔碼複製起來，貼到記事本或傳給自己保存。',
       'save.importMsg': '貼上存檔碼後按「匯入」，目前的進度會被取代。',
       'save.copied': '✅ 已複製到剪貼簿！',
@@ -1125,7 +1214,6 @@
       'dress.happy': '{name}覺得很開心♡',
       'house.title': '🏠 史萊姆之家', 'house.guests': '{icon} {pool}的住客',
       'house.tip': '點選史萊姆可以幫牠取名字、用 🌈 彩虹金幣換裝喔！', 'house.edit': '✏️ 取名・換裝',
-      'stat.coins': '溫泉幣', 'stat.cps': '每秒產出', 'stat.cpc': '每次撈取', 'stat.rainbow': '🌈 彩虹金幣（{n}/秒）',
       'pool.hint': '點擊溫泉撈溫泉幣 ✦',
       'shop.title': '🛠 度假村升級',
       'upg.pool': '擴建{pool}',
@@ -1134,7 +1222,6 @@
       'upg.duck': '購買黃色小鴨', 'upg.duckDesc': '史萊姆們超開心！所有收益 +25%（可疊加）',
       'upg.snack': '史萊姆點心吧', 'upg.snackDesc': '泡完湯來串糰子！每級每秒產出 0.1 彩虹金幣',
       'upg.chair': '豪華按摩椅', 'upg.chairDesc': '放鬆後手更有力！每級手動撈取量 +100%',
-      'tab.info': '+{ps}/秒 · Lv.{lv}',
       'unlock.btn': '解鎖 💰 {n}',
       'unlock.desc': '解鎖後每秒 +{ps} 溫泉幣、每次撈取 +{pc}，還會有新的史萊姆入住！',
       'unlock.toast': '🎉 {pool} 開幕了！', 'unlock.say': '新溫泉耶！衝啊～',
@@ -1142,12 +1229,11 @@
       'fest.owned': '擁有祭典燈籠 <b>{n}</b> 個 · 所有收益 <b>+{p}%</b>',
       'fest.earned': '本輪累計賺得 💰{e} · 舉辦後可獲得 <b>{g}</b> 個燈籠',
       'fest.next': '再賺 💰{n} 可以多拿 1 個燈籠',
-      'fest.badge': '🏮 祭典燈籠 ×{n}・所有收益 +{p}%',
       'fest.confirmTitle': '要舉辦溫泉祭嗎？',
       'fest.confirmText': '史萊姆們會放天燈慶祝，度假村重新開始經營，<br>但你會獲得永久加成！',
       'fest.gain': '🏮 +{n} 個祭典燈籠',
       'fest.incomeChange': '所有收益：+{a}% → <b>+{b}%</b>',
-      'fest.resets': '🔄 <b>會重置：</b>溫泉幣、彩虹金幣、溫泉池（等級與解鎖）、小鴨、點心吧、按摩椅',
+      'fest.resets': '🔄 <b>會重置：</b>溫泉幣、彩虹金幣、溫泉池（等級與解鎖）、所有度假村升級',
       'fest.keeps': '💖 <b>會保留：</b>祭典燈籠、圖鑑、成就、史萊姆的名字與衣櫃、每日登入',
       'fest.go': '舉辦溫泉祭！', 'fest.cancel': '再想想',
       'fest.toast': '🎆 第 {n} 屆溫泉祭大成功！收益 +{p}%',
@@ -1182,7 +1268,7 @@
       'daily.note': '中斷一天沒登入，會從第 1 天重新開始',
       'daily.toast': '🎁 領到第 {n} 天的登入獎勵！', 'daily.say': '老闆今天也來了！♡',
       'reward.coins': '💰 {n} 溫泉幣', 'reward.rainbow': '🌈 {n} 彩虹金幣',
-      'off.title': '歡迎回來！', 'off.away': '你離開了 {t}', 'off.cap': '（最多計算 8 小時）',
+      'off.title': '歡迎回來！', 'off.away': '你離開了 {t}', 'off.cap': '（最多計算 {h} 小時）',
       'off.earned': '史萊姆們幫你顧店，賺到了：', 'off.ok': '收下！',
       'time.hm': '{h} 小時 {m} 分', 'time.ms': '{m} 分 {s} 秒', 'time.s': '{s} 秒',
       'rare.appear': '✨ {name}出現了！快點牠！', 'rare.bye': '掰掰～', 'rare.thanks': '謝謝光臨♡',
@@ -1190,22 +1276,19 @@
       'dex.title': '📖 稀有史萊姆圖鑑', 'dex.count': '已發現 {a} / {b}',
       'dex.seen': '已遇見 {n} 次', 'dex.active': '出沒中！快找找', 'dex.when': '{when}出現',
       'dex.unknown': '尚未發現', 'dex.limited': '季節限定',
-      'footer': '進度會自動儲存在瀏覽器中 · 右上角 ⚙️ 可以調整設定',
       'tut.next': '下一步', 'tut.skip': '跳過教學', 'tut.start': '開始經營！',
       'tut.welcomeTitle': '歡迎來到史萊姆溫泉度假村！',
       'tut.welcome': '從今天起，你就是這間溫泉的老闆♨<br>先花 30 秒認識一下吧～',
       'tut.poolTitle': '💧 點擊溫泉',
       'tut.pool': '點一下溫泉就能撈到溫泉幣！摸摸史萊姆，牠們會很開心。看到閃閃發光的稀有史萊姆，要趕快點牠喔！',
       'tut.statsTitle': '📊 你的收入',
-      'tut.stats': '這裡顯示溫泉幣、每秒自動產出和每次撈取的量。🌈 彩虹金幣可以買按摩椅和可愛的衣服。',
-      'tut.shopTitle': '🛠 升級度假村',
-      'tut.shop': '用溫泉幣擴建溫泉池、買小鴨，收入就會越來越多。買得起的項目會亮起來喔！',
+      'tut.stats': '上面是你的溫泉幣和 🌈 彩虹金幣，小字是每秒產出。🌈 彩虹金幣可以買按摩椅和可愛的衣服。',
+      'tut.shopTitle': '🛠 先從升級開始',
+      'tut.shop': '用溫泉幣擴建溫泉池、買小鴨，收入就會越來越多。有買得起的升級時，這裡會亮紅點喔！',
       'tut.tabsTitle': '🌸 更多溫泉池',
-      'tut.tabs': '存夠溫泉幣就能解鎖新的溫泉池，還會有新的史萊姆入住！',
-      'tut.houseTitle': '🏠 史萊姆之家',
-      'tut.house': '幫史萊姆取名字，再換上可愛的帽子和毛巾吧！',
+      'tut.tabs': '左邊可以切換溫泉池。存夠溫泉幣就能解鎖新的溫泉池，還會有新的史萊姆入住！',
       'tut.topTitle': '🎁 右上角的按鈕',
-      'tut.top': '🎁 每天領登入獎勵、⚙️ 設定（語言、音量、存檔）、♪ 背景音樂。<br>就算關掉遊戲，史萊姆也會幫你顧店喔！',
+      'tut.top': '⚙️ 設定（語言、音量、存檔）、♪ 背景音樂、🎁 每天的登入獎勵。<br>就算關掉遊戲，史萊姆也會幫你顧店喔！',
       'pool.forest.name': '森林露天風呂', 'pool.sakura.name': '櫻花溫泉', 'pool.aurora.name': '極光冰晶池',
       'pool.forest.lines': ['森林的空氣好清新～', '聽到小鳥在唱歌♪'],
       'pool.sakura.lines': ['花瓣掉進湯裡了～🌸', '邊賞花邊泡湯♡', '粉紅色的好療癒'],
@@ -1247,7 +1330,6 @@
 
     en: {
       'title': 'Slime Onsen Resort',
-      'h1': '♨ Slime <span>Onsen</span> Resort ♨',
       'btn.gift': 'Daily login bonus', 'btn.settings': 'Settings', 'btn.music': 'Toggle music',
       'music.tapToStart': 'Tap to start music', 'music.missing': 'bgm.mp3 not found',
       'music.pause': 'Pause music', 'music.play': 'Play music',
@@ -1263,6 +1345,18 @@
       'about.ver': 'Version {v} · Opened {d}',
       'about.credit': '🎵 Music: "Japanese Calm Piano"<br>by pianocafe_kumi · Source: Pixabay',
       'close': 'Close',
+      'hud.perSec': '+{n}/s', 'hud.bonus': 'Income +{p}%',
+      'pool.stats': '+{ps}/s · +{pc} per scoop', 'nav.shop': 'Upgrades',
+      'nav.house': 'Slimes', 'nav.dex': 'Book',
+      'nav.ach': 'Goals', 'nav.fest': 'Festival',
+      'crit': 'CRIT!', 'upg.helper': 'Cleaning Helper',
+      'upg.helperDesc': 'Scoops the onsen for you once per second per level, even while you\'re away', 'upg.milk': 'Onsen Milk Machine',
+      'upg.milkDesc': '+3% chance per level for a ×10 critical scoop (max Lv.10)', 'upg.lure': 'Welcome Lantern',
+      'upg.lureDesc': 'Rare slimes appear 25% more often and stay 2s longer per level (max Lv.8)', 'upg.bamboo': 'Spring Bamboo Pipe',
+      'upg.bambooDesc': 'Offline earnings cap +1 hour per level (base 8h, max Lv.16)', 'say.helper': 'The helper is here to clean! 🧹',
+      'say.milk': 'Glug glug… onsen milk is the best! 🥛', 'say.lure': 'Such a bright lantern, guests are coming! ✨',
+      'say.bamboo': 'Fresh spring water~ so warm! 🎋', 'tut.navTitle': '📋 Bottom menu',
+      'tut.nav': 'Upgrades, the slime house, the slime book, goals and the festival are all here. Tap to slide a panel up, tap again to close it.',
       'save.exportMsg': 'Copy this code and keep it somewhere safe, like a notes app.',
       'save.importMsg': 'Paste a save code and press "Import". Your current progress will be replaced.',
       'save.copied': '✅ Copied to clipboard!',
@@ -1278,7 +1372,6 @@
       'dress.happy': '{name} is so happy♡',
       'house.title': '🏠 Slime House', 'house.guests': '{icon} Guests of {pool}',
       'house.tip': 'Tap a slime to name it and dress it up with 🌈 rainbow coins!', 'house.edit': '✏️ Name & dress',
-      'stat.coins': 'Onsen coins', 'stat.cps': 'Per second', 'stat.cpc': 'Per scoop', 'stat.rainbow': '🌈 Rainbow ({n}/s)',
       'pool.hint': 'Tap the water to scoop coins ✦',
       'shop.title': '🛠 Resort Upgrades',
       'upg.pool': 'Expand {pool}',
@@ -1287,7 +1380,6 @@
       'upg.duck': 'Buy a rubber duck', 'upg.duckDesc': 'The slimes love it! All income +25% (stacks)',
       'upg.snack': 'Slime Snack Bar', 'upg.snackDesc': 'Dango after a soak! +0.1 rainbow coins/s per level',
       'upg.chair': 'Deluxe Massage Chair', 'upg.chairDesc': 'Relaxed hands scoop better! Scoop amount +100% per level',
-      'tab.info': '+{ps}/s · Lv.{lv}',
       'unlock.btn': 'Unlock 💰 {n}',
       'unlock.desc': 'Unlocking gives +{ps} coins/s and +{pc} per scoop, and new slimes move in!',
       'unlock.toast': '🎉 {pool} is now open!', 'unlock.say': 'A new onsen! Let\'s go~',
@@ -1295,12 +1387,11 @@
       'fest.owned': 'Festival lanterns: <b>{n}</b> · All income <b>+{p}%</b>',
       'fest.earned': 'Earned this run: 💰{e} · Hold it now for <b>{g}</b> lanterns',
       'fest.next': 'Earn 💰{n} more for +1 lantern',
-      'fest.badge': '🏮 Lanterns ×{n} · All income +{p}%',
       'fest.confirmTitle': 'Hold the Onsen Festival?',
       'fest.confirmText': 'The slimes will release sky lanterns and the resort starts over,<br>but you get a permanent bonus!',
       'fest.gain': '🏮 +{n} festival lanterns',
       'fest.incomeChange': 'All income: +{a}% → <b>+{b}%</b>',
-      'fest.resets': '🔄 <b>Resets:</b> onsen coins, rainbow coins, pools (levels & unlocks), ducks, snack bar, massage chairs',
+      'fest.resets': '🔄 <b>Resets:</b> onsen coins, rainbow coins, pools (levels & unlocks), all resort upgrades',
       'fest.keeps': '💖 <b>Keeps:</b> lanterns, slime book, achievements, slime names & wardrobe, daily login',
       'fest.go': 'Hold it!', 'fest.cancel': 'Maybe later',
       'fest.toast': '🎆 Festival #{n} was a hit! Income +{p}%',
@@ -1335,7 +1426,7 @@
       'daily.note': 'Miss a day and the streak restarts from day 1',
       'daily.toast': '🎁 Day {n} bonus claimed!', 'daily.say': 'The boss is here again today! ♡',
       'reward.coins': '💰 {n} onsen coins', 'reward.rainbow': '🌈 {n} rainbow coins',
-      'off.title': 'Welcome back!', 'off.away': 'You were away for {t}', 'off.cap': ' (up to 8 hours count)',
+      'off.title': 'Welcome back!', 'off.away': 'You were away for {t}', 'off.cap': ' (up to {h} hours count)',
       'off.earned': 'The slimes kept the shop running and earned:', 'off.ok': 'Collect!',
       'time.hm': '{h}h {m}m', 'time.ms': '{m}m {s}s', 'time.s': '{s}s',
       'rare.appear': '✨ {name} appeared! Tap it quick!', 'rare.bye': 'Bye-bye~', 'rare.thanks': 'Thanks for having me♡',
@@ -1343,22 +1434,19 @@
       'dex.title': '📖 Rare Slime Book', 'dex.count': 'Found {a} / {b}',
       'dex.seen': 'Met {n} times', 'dex.active': 'Around now! Look out', 'dex.when': 'Appears in {when}',
       'dex.unknown': 'Not found yet', 'dex.limited': 'Seasonal',
-      'footer': 'Progress is saved automatically in your browser · Settings are under ⚙️ at the top right',
       'tut.next': 'Next', 'tut.skip': 'Skip', 'tut.start': 'Let\'s go!',
       'tut.welcomeTitle': 'Welcome to Slime Onsen Resort!',
       'tut.welcome': 'Starting today, you run this onsen♨<br>Let\'s take a quick 30-second tour~',
       'tut.poolTitle': '💧 Tap the onsen',
       'tut.pool': 'Tap the water to scoop onsen coins! Pet the slimes — they love it. If a sparkly rare slime shows up, tap it fast!',
       'tut.statsTitle': '📊 Your income',
-      'tut.stats': 'Here are your onsen coins and your income per second and per scoop. 🌈 Rainbow coins buy massage chairs and cute outfits.',
-      'tut.shopTitle': '🛠 Upgrade your resort',
-      'tut.shop': 'Spend coins to expand pools and buy ducks, and you\'ll earn more and more. Upgrades you can afford light up!',
+      'tut.stats': 'Up here are your onsen coins and 🌈 rainbow coins, with income per second in small text. 🌈 Rainbow coins buy massage chairs and cute outfits.',
+      'tut.shopTitle': '🛠 Start with upgrades',
+      'tut.shop': 'Spend coins to expand pools and buy ducks, and you\'ll earn more and more. A red dot shows up here when you can afford an upgrade!',
       'tut.tabsTitle': '🌸 More onsen pools',
-      'tut.tabs': 'Save up to unlock new pools — new slimes will move in too!',
-      'tut.houseTitle': '🏠 Slime House',
-      'tut.house': 'Name your slimes and dress them up in cute hats and towels!',
+      'tut.tabs': 'Switch pools on the left. Save up to unlock new pools, and new slimes will move in!',
       'tut.topTitle': '🎁 Top-right buttons',
-      'tut.top': '🎁 Daily bonus, ⚙️ settings (language, volume, saves), ♪ music.<br>The slimes keep the shop running even while you\'re away!',
+      'tut.top': '⚙️ settings (language, volume, saves), ♪ music, 🎁 daily bonus.<br>The slimes keep the shop running even while you\'re away!',
       'pool.forest.name': 'Forest Open-Air Bath', 'pool.sakura.name': 'Sakura Onsen', 'pool.aurora.name': 'Aurora Ice Pool',
       'pool.forest.lines': ['The forest air is so fresh~', 'I can hear birds singing♪'],
       'pool.sakura.lines': ['Petals fell in the water~🌸', 'Flower viewing in the bath♡', 'All this pink is so soothing'],
@@ -1400,7 +1488,6 @@
 
     ja: {
       'title': 'スライム温泉リゾート',
-      'h1': '♨ スライム<span>温泉</span>リゾート ♨',
       'btn.gift': 'ログインボーナス', 'btn.settings': '設定', 'btn.music': 'BGMのオン・オフ',
       'music.tapToStart': 'タップで音楽スタート', 'music.missing': 'bgm.mp3 が見つかりません',
       'music.pause': '音楽を一時停止', 'music.play': '音楽を再生',
@@ -1416,6 +1503,18 @@
       'about.ver': 'バージョン {v} · 開業日 {d}',
       'about.credit': '🎵 BGM：「Japanese Calm Piano」<br>作曲：pianocafe_kumi · 出典：Pixabay',
       'close': '閉じる',
+      'hud.perSec': '+{n}/秒', 'hud.bonus': '収入 +{p}%',
+      'pool.stats': '毎秒 +{ps} · 1回 +{pc}', 'nav.shop': '強化',
+      'nav.house': 'スライム', 'nav.dex': '図鑑',
+      'nav.ach': '実績', 'nav.fest': 'まつり',
+      'crit': '会心！', 'upg.helper': 'お掃除ヘルパー',
+      'upg.helperDesc': '1レベルごとに毎秒1回、自動でお湯をすくってくれるよ（留守中も）', 'upg.milk': '温泉牛乳の自販機',
+      'upg.milkDesc': '1レベルごとに会心率 +3%、会心ですくい量 ×10（最大 Lv.10）', 'upg.lure': '招き大提灯',
+      'upg.lureDesc': 'レアスライムの出現率 +25%・滞在時間 +2秒（最大 Lv.8）', 'upg.bamboo': '源泉の竹筒',
+      'upg.bambooDesc': '1レベルごとにオフライン収入の上限 +1時間（基本8時間、最大 Lv.16）', 'say.helper': 'お掃除ヘルパー参上！🧹',
+      'say.milk': 'ごくごく…温泉牛乳さいこう！🥛', 'say.lure': '提灯が明るくてお客さんが来るよ！✨',
+      'say.bamboo': '源泉が流れてきた〜あったか！🎋', 'tut.navTitle': '📋 下のメニュー',
+      'tut.nav': '強化・スライムの家・図鑑・実績・温泉まつりはここ。タップすると下から出てきて、もう一度タップで閉じるよ。',
       'save.exportMsg': 'このコードをコピーして、メモ帳などに保存してね。',
       'save.importMsg': 'コードを貼り付けて「読み込み」を押してね。今の進行状況は上書きされます。',
       'save.copied': '✅ コピーしました！',
@@ -1431,7 +1530,6 @@
       'dress.happy': '{name}はとっても嬉しそう♡',
       'house.title': '🏠 スライムの家', 'house.guests': '{icon} {pool}のお客さん',
       'house.tip': 'スライムをタップして名前をつけたり、🌈 虹コインでお着替えできるよ！', 'house.edit': '✏️ 名前・着替え',
-      'stat.coins': '温泉コイン', 'stat.cps': '毎秒', 'stat.cpc': '1回のすくい', 'stat.rainbow': '🌈 虹コイン（{n}/秒）',
       'pool.hint': 'お湯をタップしてコインをすくおう ✦',
       'shop.title': '🛠 リゾート強化',
       'upg.pool': '{pool}を拡張',
@@ -1440,7 +1538,6 @@
       'upg.duck': 'アヒルちゃんを買う', 'upg.duckDesc': 'スライムたち大喜び！全収入 +25%（重ねがけ可）',
       'upg.snack': 'スライムおやつ処', 'upg.snackDesc': '湯上がりにお団子！1レベルごとに虹コイン +0.1/秒',
       'upg.chair': '極上マッサージチェア', 'upg.chairDesc': 'リラックスして力いっぱい！1レベルごとにすくい量 +100%',
-      'tab.info': '+{ps}/秒 · Lv.{lv}',
       'unlock.btn': '解放 💰 {n}',
       'unlock.desc': '解放すると毎秒 +{ps} コイン、すくい +{pc}、新しいスライムもやって来るよ！',
       'unlock.toast': '🎉 {pool}オープン！', 'unlock.say': '新しい温泉だ！いっくよ〜',
@@ -1448,12 +1545,11 @@
       'fest.owned': '祭り提灯 <b>{n}</b> 個 · 全収入 <b>+{p}%</b>',
       'fest.earned': '今回の稼ぎ 💰{e} · 開催すると提灯 <b>{g}</b> 個',
       'fest.next': 'あと 💰{n} 稼ぐと提灯 +1',
-      'fest.badge': '🏮 祭り提灯 ×{n}・全収入 +{p}%',
       'fest.confirmTitle': '温泉まつりを開催する？',
       'fest.confirmText': 'スライムたちが天灯を上げてお祝い！リゾートは最初からになるけど、<br>ずっと続くボーナスがもらえるよ！',
       'fest.gain': '🏮 祭り提灯 +{n} 個',
       'fest.incomeChange': '全収入：+{a}% → <b>+{b}%</b>',
-      'fest.resets': '🔄 <b>リセット：</b>温泉コイン、虹コイン、温泉（レベル・解放）、アヒル、おやつ処、マッサージチェア',
+      'fest.resets': '🔄 <b>リセット：</b>温泉コイン、虹コイン、温泉（レベル・解放）、すべてのリゾート強化',
       'fest.keeps': '💖 <b>引き継ぎ：</b>祭り提灯、図鑑、実績、スライムの名前と衣装、ログインボーナス',
       'fest.go': '開催する！', 'fest.cancel': 'やっぱりやめる',
       'fest.toast': '🎆 第{n}回温泉まつり大成功！収入 +{p}%',
@@ -1488,7 +1584,7 @@
       'daily.note': '1日でも休むと1日目からやり直しだよ',
       'daily.toast': '🎁 {n}日目のボーナスをゲット！', 'daily.say': 'オーナー今日も来てくれた！♡',
       'reward.coins': '💰 {n} 温泉コイン', 'reward.rainbow': '🌈 {n} 虹コイン',
-      'off.title': 'おかえりなさい！', 'off.away': '{t}留守にしていたよ', 'off.cap': '（最大8時間まで）',
+      'off.title': 'おかえりなさい！', 'off.away': '{t}留守にしていたよ', 'off.cap': '（最大{h}時間まで）',
       'off.earned': 'スライムたちがお店番をして稼いだよ：', 'off.ok': '受け取る！',
       'time.hm': '{h}時間{m}分', 'time.ms': '{m}分{s}秒', 'time.s': '{s}秒',
       'rare.appear': '✨ {name}が現れた！早くタップ！', 'rare.bye': 'バイバイ〜', 'rare.thanks': 'ありがとうございました♡',
@@ -1496,22 +1592,19 @@
       'dex.title': '📖 レアスライム図鑑', 'dex.count': '発見 {a} / {b}',
       'dex.seen': '{n}回出会った', 'dex.active': '出没中！探してみて', 'dex.when': '{when}に出現',
       'dex.unknown': '未発見', 'dex.limited': '季節限定',
-      'footer': '進行状況はブラウザに自動保存されます · 設定は右上の ⚙️ から',
       'tut.next': '次へ', 'tut.skip': 'スキップ', 'tut.start': 'はじめる！',
       'tut.welcomeTitle': 'スライム温泉リゾートへようこそ！',
       'tut.welcome': '今日からあなたがこの温泉のオーナー♨<br>30秒だけ案内させてね〜',
       'tut.poolTitle': '💧 温泉をタップ',
       'tut.pool': 'お湯をタップすると温泉コインがすくえるよ！スライムをなでると喜ぶよ。キラキラのレアスライムが来たら、すぐタップしてね！',
       'tut.statsTitle': '📊 収入',
-      'tut.stats': '温泉コイン、毎秒の収入、1回のすくい量がここに出るよ。🌈 虹コインはマッサージチェアやかわいい服に使えるよ。',
-      'tut.shopTitle': '🛠 リゾートを強化',
-      'tut.shop': 'コインで温泉を拡張したりアヒルを買うと、どんどん稼げるよ。買えるものは明るく表示されるよ！',
+      'tut.stats': '上にあるのが温泉コインと 🌈 虹コイン、小さい字は毎秒の収入だよ。🌈 虹コインはマッサージチェアやかわいい服に使えるよ。',
+      'tut.shopTitle': '🛠 まずは強化から',
+      'tut.shop': 'コインで温泉を拡張したりアヒルを買うと、どんどん稼げるよ。買える強化があると、ここに赤い点がつくよ！',
       'tut.tabsTitle': '🌸 新しい温泉',
-      'tut.tabs': 'コインを貯めると新しい温泉を解放できて、新しいスライムもやって来るよ！',
-      'tut.houseTitle': '🏠 スライムの家',
-      'tut.house': 'スライムに名前をつけて、かわいい帽子やタオルを着せてあげよう！',
+      'tut.tabs': '左のボタンで温泉を切り替えられるよ。コインを貯めると新しい温泉を解放できて、新しいスライムもやって来るよ！',
       'tut.topTitle': '🎁 右上のボタン',
-      'tut.top': '🎁 毎日のボーナス、⚙️ 設定（言語・音量・セーブ）、♪ BGM。<br>ゲームを閉じても、スライムたちがお店番してくれるよ！',
+      'tut.top': '⚙️ 設定（言語・音量・セーブ）、♪ BGM、🎁 毎日のボーナス。<br>ゲームを閉じても、スライムたちがお店番してくれるよ！',
       'pool.forest.name': '森の露天風呂', 'pool.sakura.name': '桜の湯', 'pool.aurora.name': 'オーロラ氷の湯',
       'pool.forest.lines': ['森の空気がおいしい〜', '小鳥が歌ってる♪'],
       'pool.sakura.lines': ['花びらがお湯に落ちた〜🌸', 'お花見しながらお風呂♡', 'ピンク色で癒される〜'],
@@ -1600,6 +1693,7 @@
   const freshState = () => ({
     coins: 0, rainbow: 0,
     ducks: 0, snackLv: 0, chairLv: 0,
+    helperLv: 0, milkLv: 0, bambooLv: 0, lureLv: 0,   // v2.2 新升級：打掃小幫手 / 牛奶販賣機 / 源泉竹筒 / 招客大燈籠
     pools: Object.fromEntries(POOLS.map(p => [p.id, { unlocked: p.unlock === 0, lv: 0 }])),
     activePool: 'forest',
     dex: {},               // 稀有史萊姆 id → 捕獲次數
@@ -1631,15 +1725,26 @@
     duck:  () => Math.floor(100 * Math.pow(1.8, state.ducks)),
     snack: () => Math.floor(500 * Math.pow(1.5, state.snackLv)),
     chair: () => Math.floor(5 * Math.pow(1.6, state.chairLv)),   // 以彩虹金幣計價
+    helper: () => Math.floor(1000 * Math.pow(1.7, state.helperLv)),
+    milk:   () => Math.floor(2000 * Math.pow(1.9, state.milkLv)),
+    lure:   () => Math.floor(3000 * Math.pow(2, state.lureLv)),
+    bamboo: () => Math.floor(10 * Math.pow(1.5, state.bambooLv)),  // 以彩虹金幣計價
   };
+  // 有上限的升級
+  const MAX_LV = { milk: 10, bamboo: 16, lure: 8 };
+  const critChance = () => state.milkLv * 0.03;                    // 牛奶：每級 +3% 暴擊機率，暴擊 ×10
+  const CRIT_MULT = 10;
+  const offlineCapSec = () => (8 + state.bambooLv) * 3600;         // 竹筒：每級離線上限 +1 小時
   const lanternMult = () => 1 + state.lanterns * 0.1;              // 每個祭典燈籠 +10% 所有收益
   const multiplier = () => (1 + state.ducks * 0.25) * lanternMult();
   const poolPerSecond = p => state.pools[p.id].unlocked ? (p.base + p.perLv * state.pools[p.id].lv) * multiplier() : 0;
-  const perSecond  = () => POOLS.reduce((sum, p) => sum + poolPerSecond(p), 0);
   const perClick   = () => POOLS.reduce((sum, p) => {
     const d = state.pools[p.id];
     return d.unlocked ? sum + p.clickBase + p.clickPerLv * d.lv : sum;
   }, 0) * (1 + state.chairLv) * multiplier();
+  // 打掃小幫手：每級每秒自動撈 1 次（不會暴擊），算進每秒產出，所以離線也會幫忙
+  const autoPerSecond = () => perClick() * state.helperLv;
+  const perSecond  = () => POOLS.reduce((sum, p) => sum + poolPerSecond(p), 0) + autoPerSecond();
   const rainbowPerSecond = () => state.snackLv * 0.1;
 
   // ===== 儲存 / 讀取 =====
@@ -1701,10 +1806,22 @@
   const $ = id => document.getElementById(id);
   const pool = $('pool');
 
+  // 有上限的升級：滿級時顯示 MAX 並停用
+  function renderUpgrade(kind, field, cur) {
+    const lv = state[field], maxed = lv >= (MAX_LV[kind] || Infinity);
+    $('cost-' + kind).textContent = maxed ? 'MAX' : fmt(cost[kind]());
+    $('lv-' + kind).textContent = lv;
+    $('buy-' + kind).classList.toggle('maxed', maxed);
+    $('buy-' + kind).disabled = maxed || state[cur] < cost[kind]();
+  }
+
   function render() {
+    // 上方資訊列與溫泉池底部的產量
     $('coins').textContent = fmt(state.coins);
-    $('cps').textContent = fmt(perSecond());
-    $('cpc').textContent = fmt(perClick());
+    $('cps-label').textContent = t('hud.perSec', { n: fmt(perSecond()) });
+    $('rainbow').textContent = fmt(state.rainbow);
+    $('rps-label').textContent = t('hud.perSec', { n: fmt(rainbowPerSecond()) });
+    $('pool-stats').textContent = t('pool.stats', { ps: fmt(perSecond()), pc: fmt(perClick()) });
     const def = active(), data = activeData();
     $('pool-icon').textContent = def.icon;
     $('pool-upg-name').textContent = t('upg.pool', { pool: def.name });
@@ -1719,9 +1836,7 @@
 
     for (const p of POOLS) {
       const d = state.pools[p.id];
-      $('tabinfo-' + p.id).textContent = d.unlocked
-        ? t('tab.info', { ps: fmt(poolPerSecond(p)), lv: d.lv })
-        : `🔒 💰 ${fmt(p.unlock)}`;
+      $('tabinfo-' + p.id).textContent = d.unlocked ? 'Lv.' + d.lv : '🔒';
       $('tab-' + p.id).classList.toggle('locked', !d.unlocked);
     }
     if (!data.unlocked) {
@@ -1730,15 +1845,26 @@
     }
     $('buy-duck').disabled = state.coins < cost.duck();
 
-    $('rainbow').textContent = fmt(state.rainbow);
-    $('rainbow-label').textContent = t('stat.rainbow', { n: fmt(rainbowPerSecond()) });
     $('cost-snack').textContent = fmt(cost.snack());
     $('cost-chair').textContent = fmt(cost.chair());
     $('lv-snack').textContent = state.snackLv;
     $('lv-chair').textContent = state.chairLv;
     $('buy-snack').disabled = state.coins < cost.snack();
     $('buy-chair').disabled = state.rainbow < cost.chair();
+    renderUpgrade('helper', 'helperLv', 'coins');
+    renderUpgrade('milk', 'milkLv', 'coins');
+    renderUpgrade('lure', 'lureLv', 'coins');
+    renderUpgrade('bamboo', 'bambooLv', 'rainbow');
     renderFestival();
+
+    // 下方分頁列的紅點：有買得起的升級 / 有成就可以領 / 可以舉辦溫泉祭
+    setNavDot('shop', [...document.querySelectorAll('.shop .item')].some(b => !b.disabled));
+    setNavDot('ach', ACHIEVEMENTS.some(a => state.ach[a.id] === 'done'));
+    setNavDot('fest', festGain() >= 1);
+  }
+  function setNavDot(pane, on) {
+    const dot = document.querySelector(`.nav-btn[data-pane="${pane}"] .ndot`);
+    if (dot.hidden === on) dot.hidden = !on;
   }
 
   // ===== 溫泉祭（轉生系統）=====
@@ -1757,8 +1883,9 @@
       $('fest-lanterns').innerHTML = n
         ? '<span>🏮</span>'.repeat(Math.min(n, 5)) + (n > 5 ? `<span class="more">×${n}</span>` : '')
         : '<span style="opacity:.35">🏮</span>';
-      $('lantern-badge').hidden = !n;
-      $('lantern-badge').textContent = t('fest.badge', { n, p: n * 10 });
+      $('lantern-chip').hidden = !n;
+      $('lantern-count').textContent = n;
+      $('lantern-bonus').textContent = t('hud.bonus', { p: n * 10 });
       $('fest-line1').innerHTML = t('fest.owned', { n, p: n * 10 });
     }
     $('fest-line2').innerHTML = t('fest.earned', { e: fmt(state.runEarned), g: gain });
@@ -1800,6 +1927,7 @@
     // 只重置「本輪」的經營進度，其餘收藏類資料全部保留
     Object.assign(state, {
       coins: 0, rainbow: 0, ducks: 0, snackLv: 0, chairLv: 0,
+      helperLv: 0, milkLv: 0, bambooLv: 0, lureLv: 0,
       pools: base.pools, activePool: 'forest', runEarned: 0,
     });
     refreshAll();
@@ -1895,9 +2023,9 @@
   }, true);
 
   // 在池中 (x, y) 顯示飄字
-  function floatText(x, y, text) {
+  function floatText(x, y, text, cls) {
     const ft = document.createElement('div');
-    ft.className = 'float-txt'; ft.textContent = text;
+    ft.className = 'float-txt' + (cls ? ' ' + cls : ''); ft.textContent = text;
     ft.style.left = x + 'px'; ft.style.top = y + 'px';
     pool.appendChild(ft);
     setTimeout(() => ft.remove(), 1000);
@@ -1907,16 +2035,17 @@
   pool.addEventListener('click', e => {
     const r = pool.getBoundingClientRect();
     const x = e.clientX - r.left, y = e.clientY - r.top;
-    const gain = perClick();
+    const crit = Math.random() < critChance();
+    const gain = perClick() * (crit ? CRIT_MULT : 1);
     earn(gain);
     state.stats.clicks++;
-    sfx.pop();
+    if (crit) sfx.ding(); else sfx.pop();
 
     const rp = document.createElement('div');
     rp.className = 'ripple'; rp.style.left = x + 'px'; rp.style.top = y + 'px';
     pool.appendChild(rp);
     setTimeout(() => rp.remove(), 700);
-    floatText(x, y, '+' + fmt(gain));
+    floatText(x, y, (crit ? t('crit') + ' +' : '+') + fmt(gain), crit ? 'crit' : '');
     spawnParticles(x, y);
     render();
     checkAchievements();
@@ -2045,7 +2174,7 @@
             ${right}
           </div>`;
       }).join('');
-      $('ach-count').textContent = t('ach.count', { a: ACHIEVEMENTS.filter(a => state.ach[a.id]).length, b: ACHIEVEMENTS.length });
+      setPaneSub('ach', t('ach.count', { a: ACHIEVEMENTS.filter(a => state.ach[a.id]).length, b: ACHIEVEMENTS.length }));
     }
     const cards = $('ach-list').children;
     ACHIEVEMENTS.forEach((a, i) => {
@@ -2069,6 +2198,47 @@
     const s = slimes[Math.floor(Math.random() * slimes.length)];
     if (s) say(s, t('ach.say'));
     renderAch(); render(); save();
+  });
+
+  // ===== 下方分頁列 & 滑出面板 =====
+  const PANE_TITLE = { shop: 'shop.title', house: 'house.title', dex: 'dex.title', ach: 'ach.title', fest: 'fest.title' };
+  const paneSubs = {};          // 各面板標題旁的小字（例如「已發現 3 / 9」）
+  let openPaneId = null;
+  function setPaneSub(pane, text) {
+    paneSubs[pane] = text;
+    if (openPaneId === pane) $('sheet-sub').textContent = text;
+  }
+  function renderSheetHead() {
+    if (!openPaneId) return;
+    $('sheet-title').textContent = t(PANE_TITLE[openPaneId]);
+    $('sheet-sub').textContent = paneSubs[openPaneId] || '';
+  }
+  function openPane(id) {
+    openPaneId = id;
+    document.querySelectorAll('.pane').forEach(el => el.classList.toggle('on', el.dataset.pane === id));
+    document.querySelectorAll('.nav-btn').forEach(el => el.classList.toggle('on', el.dataset.pane === id));
+    renderSheetHead();
+    $('sheet-body').scrollTop = 0;
+    $('sheet').classList.add('open');
+    $('sheet').setAttribute('aria-hidden', 'false');
+  }
+  function closeSheet() {
+    if (!openPaneId) return;
+    openPaneId = null;
+    document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('on'));
+    $('sheet').classList.remove('open');
+    $('sheet').setAttribute('aria-hidden', 'true');
+  }
+  $('nav').addEventListener('click', e => {
+    const b = e.target.closest('.nav-btn');
+    if (!b) return;
+    if (openPaneId === b.dataset.pane) closeSheet();   // 再點一次同一個分頁 → 收起來
+    else openPane(b.dataset.pane);
+  });
+  $('sheet-close').addEventListener('click', closeSheet);
+  document.addEventListener('keydown', e => {
+    // Esc 一次只關最上層：設定 / 換裝視窗已經處理過的話（defaultPrevented）就不關面板
+    if (e.key === 'Escape' && openPaneId && !e.defaultPrevented && settingsBg.hidden && dressBg.hidden) closeSheet();
   });
 
   // ===== 購買升級 =====
@@ -2097,6 +2267,21 @@
     const s = slimes[Math.floor(Math.random() * slimes.length)];
     if (s) say(s, t(state.snackLv === 1 ? 'say.snackOpen' : 'say.snack'));
   });
+  // 新升級共用的購買流程：kind = cost 的名稱，field = state 的欄位，cur = 'coins' 或 'rainbow'
+  function buyUpgrade(kind, field, cur, line) {
+    const c = cost[kind]();
+    if (state[field] >= (MAX_LV[kind] || Infinity) || state[cur] < c) return;
+    state[cur] -= c; state[field]++;
+    sfx.ding();
+    render(); save();
+    const s = slimes[Math.floor(Math.random() * slimes.length)];
+    if (s) say(s, t(line));
+  }
+  $('buy-helper').addEventListener('click', () => buyUpgrade('helper', 'helperLv', 'coins', 'say.helper'));
+  $('buy-milk').addEventListener('click',   () => buyUpgrade('milk', 'milkLv', 'coins', 'say.milk'));
+  $('buy-lure').addEventListener('click',   () => buyUpgrade('lure', 'lureLv', 'coins', 'say.lure'));
+  $('buy-bamboo').addEventListener('click', () => buyUpgrade('bamboo', 'bambooLv', 'rainbow', 'say.bamboo'));
+
   $('buy-chair').addEventListener('click', () => {
     const c = cost.chair();
     if (state.rainbow < c) return;
@@ -2123,7 +2308,9 @@
   $('gear-btn').addEventListener('click', openSettings);
   $('settings-close').addEventListener('click', closeSettings);
   settingsBg.addEventListener('click', e => { if (e.target === settingsBg) closeSettings(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !settingsBg.hidden) closeSettings(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !settingsBg.hidden) { closeSettings(); e.preventDefault(); }   // 標記已處理，後面的面板不要跟著關
+  });
 
   // ----- 音量滑桿 -----
   const VOL_SLIDERS = {
@@ -2517,7 +2704,7 @@
   // ===== 史萊姆之家 & 換裝 =====
   function renderHouse() {
     const def = active();
-    $('house-pool').textContent = t('house.guests', { icon: def.icon, pool: def.name });
+    setPaneSub('house', t('house.guests', { icon: def.icon, pool: def.name }));
     $('house').innerHTML = slimes.map(s => {
       const look = getLook(s.poolId, s.index);
       return `<button class="house-card" data-i="${s.index}">
@@ -2584,7 +2771,9 @@
   }
   $('dress-close').addEventListener('click', closeDress);
   dressBg.addEventListener('click', e => { if (e.target === dressBg) closeDress(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !dressBg.hidden) closeDress(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !dressBg.hidden) { closeDress(); e.preventDefault(); }
+  });
   $('dress-name').addEventListener('keydown', e => { if (e.key === 'Enter') closeDress(); });
 
   // 點衣櫃：已擁有 → 穿上；未擁有 → 用彩虹金幣購買並穿上
@@ -2615,13 +2804,19 @@
 
   // ===== 多重溫泉池：分頁、切換、解鎖 =====
   $('pool-tabs').innerHTML = POOLS.map(p => `
-    <button class="tab" id="tab-${p.id}" data-pool="${p.id}">
-      <b id="tabname-${p.id}"></b>
-      <small id="tabinfo-${p.id}"></small>
+    <button class="round-btn pool-btn" id="tab-${p.id}" data-pool="${p.id}">
+      ${p.icon}<span class="plv" id="tabinfo-${p.id}"></span>
     </button>`).join('');
-  const renderTabNames = () => POOLS.forEach(p => { $('tabname-' + p.id).textContent = `${p.icon} ${p.name}`; });
+  // 按鈕上只有圖示，名稱放在滑鼠提示 / 讀屏文字，以及溫泉池上方的名牌
+  const renderTabNames = () => {
+    POOLS.forEach(p => {
+      $('tab-' + p.id).title = p.name;
+      $('tab-' + p.id).setAttribute('aria-label', p.name);
+    });
+    $('pool-title').textContent = active().name;
+  };
   $('pool-tabs').addEventListener('click', e => {
-    const tab = e.target.closest('.tab');
+    const tab = e.target.closest('.pool-btn');
     if (tab && tab.dataset.pool !== state.activePool) switchPool(tab.dataset.pool);
   });
 
@@ -2633,6 +2828,7 @@
     while (slimes.length) slimes.pop().el.remove();   // 換成這座池子的史萊姆
     syncSlimes(true);
     POOLS.forEach(p => $('tab-' + p.id).classList.toggle('active', p.id === id));
+    $('pool-title').textContent = def.name;
 
     const locked = !activeData().unlocked;
     $('lock-overlay').hidden = !locked;
@@ -2792,8 +2988,9 @@
   RARE_TYPES.forEach(r => Object.defineProperty(r, 'rarity', {
     get: () => r.season ? t('rarity.' + r.season) : r.stars, enumerable: true }));
   const isAvailable = t => !t.season || SEASONS.includes(t.season);
-  const RARE_STAY_MS = 12000;     // 停留時間
-  const RARE_CHANCE = 1 / 45;     // 每秒出現機率（平均約 45 秒一隻）
+  // 停留時間 12 秒、每秒出現機率 1/45（平均約 45 秒一隻）；招客大燈籠每級：停留 +2 秒、機率 +25%
+  const rareStayMs = () => 12000 + state.lureLv * 2000;
+  const rareChance = () => (1 / 45) * (1 + state.lureLv * 0.25);
   let rare = null;
 
   function pickRareType() {
@@ -2817,7 +3014,7 @@
     const s = createSlime({ color: type.color, hat: type.hat, rare: true });
     s.type = type;
     s.el.addEventListener('click', e => { e.stopPropagation(); catchRare(s); });
-    s.leaveTimer = setTimeout(() => { say(s, t('rare.bye')); removeRare(s); }, RARE_STAY_MS);
+    s.leaveTimer = setTimeout(() => { say(s, t('rare.bye')); removeRare(s); }, rareStayMs());
     rare = s;
     say(s, type.hello);
     toast(t('rare.appear', { name: type.name }));
@@ -2869,7 +3066,7 @@
           <div class="count">${status}</div>
         </div>`;
     }).join('');
-    $('dex-count').textContent = t('dex.count', { a: RARE_TYPES.filter(r => state.dex[r.id]).length, b: RARE_TYPES.length });
+    setPaneSub('dex', t('dex.count', { a: RARE_TYPES.filter(r => state.dex[r.id]).length, b: RARE_TYPES.length }));
   }
 
   // ===== 小鴨 =====
@@ -2897,7 +3094,7 @@
   // ===== 離線收益 =====
   // 回傳是否有顯示離線收益視窗；onClose 會在玩家按下「收下！」後執行
   function grantOffline(onClose) {
-    const away = Math.min((Date.now() - state.lastSeen) / 1000, OFFLINE_CAP_SEC);
+    const away = Math.min((Date.now() - state.lastSeen) / 1000, offlineCapSec());   // 基本 8 小時，竹筒可以加長
     if (away < 10) return false;
     const gain = perSecond() * away;
     const rainbowGain = rainbowPerSecond() * away;
@@ -2918,7 +3115,7 @@
       <div class="modal">
         <div class="big">🌙♨️</div>
         <h3>${t('off.title')}</h3>
-        <p>${t('off.away', { t: fmtTime(sec) })}${sec >= OFFLINE_CAP_SEC ? t('off.cap') : ''}</p>
+        <p>${t('off.away', { t: fmtTime(sec) })}${sec >= offlineCapSec() ? t('off.cap', { h: offlineCapSec() / 3600 }) : ''}</p>
         <p>${t('off.earned')}</p>
         <div class="gain">${t('reward.coins', { n: fmt(gain) })}</div>
         ${rainbowGain > 0 ? `<div class="gain" style="color:#b77ad6;font-size:1.2rem">${t('reward.rainbow', { n: fmt(rainbowGain) })}</div>` : ''}
@@ -2954,6 +3151,7 @@
     if (!settingsBg.hidden) openSettings();
     // 遊戲畫面
     renderTabNames();
+    renderSheetHead();
     renderSeasonBadge();
     lanternShown = -1;                     // 讓溫泉祭區塊重寫
     if (!activeData().unlocked) renderLock();
@@ -2968,12 +3166,12 @@
   // 依序把畫面上的區塊打亮並說明；教學中擋住遊戲畫面，避免誤點。
   const TUT_STEPS = [
     { key: 'welcome', target: null, langs: true },
-    { key: 'pool',  target: () => document.querySelector('.pool-frame') },
-    { key: 'stats', target: () => document.querySelector('.stats') },
-    { key: 'shop',  target: () => document.querySelector('.shop') },
+    { key: 'pool',  target: () => $('pool') },
+    { key: 'stats', target: () => document.querySelector('.hud') },
     { key: 'tabs',  target: () => $('pool-tabs') },
-    { key: 'house', target: () => $('house') },
-    { key: 'top',   target: () => document.querySelector('.top-btns'), fixed: true },
+    { key: 'nav',   target: () => $('nav') },
+    { key: 'shop',  target: () => document.querySelector('.nav-btn[data-pane="shop"]') },
+    { key: 'top',   target: () => document.querySelector('.top-btns') },
   ];
   let tut = null;   // 進行中的教學：{ step, layer, spot, card, raf, onDone }
 
@@ -2990,17 +3188,18 @@
       if (b.dataset.lang) { if (b.dataset.lang !== lang) setLang(b.dataset.lang); return; }
       if (b.classList.contains('tut-skip')) return endTutorial();
       if (b.classList.contains('tut-next')) {
-        if (tut.step < TUT_STEPS.length - 1) { tut.step++; showTutStep(true); }
+        if (tut.step < TUT_STEPS.length - 1) { tut.step++; showTutStep(); }
         else endTutorial();
       }
     });
-    showTutStep(true);
+    closeSheet();
+    showTutStep();
     tutLoop();
     window.addEventListener('scroll', placeTut, { passive: true });
     window.addEventListener('resize', placeTut);
   }
 
-  function showTutStep(scroll) {
+  function showTutStep() {
     const st = TUT_STEPS[tut.step], last = tut.step === TUT_STEPS.length - 1;
     tut.card.innerHTML = `
       ${st.target ? '' : '<div class="tut-slime">♨️</div>'}
@@ -3013,14 +3212,6 @@
         <span class="tut-step">${tut.step + 1} / ${TUT_STEPS.length}</span>
         <button class="tut-next">${t(last ? 'tut.start' : 'tut.next')}</button>
       </div>`;
-    const el = st.target && st.target();
-    if (scroll && el && !st.fixed) {
-      // 目標＋說明卡放得進一個畫面 → 兩個一起置中（卡片在下方）；放不下 → 目標置中，卡片貼底
-      const r = el.getBoundingClientRect(), ch = tut.card.offsetHeight, vh = window.innerHeight;
-      const total = r.height + 16 + 12 + ch;          // 目標 + 打亮框的邊距 + 間隔 + 卡片
-      const want = total <= vh - 16 ? (vh - total) / 2 + 8 : (vh - r.height) / 2;
-      window.scrollTo({ top: window.scrollY + r.top - want, behavior: 'smooth' });
-    }
     placeTut();
   }
 
@@ -3069,7 +3260,6 @@
     tut = null;
     state.tutorial = true;
     save();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
     if (done) done();
   }
 
@@ -3112,7 +3302,7 @@
   setInterval(save, 5000);
   setInterval(checkAchievements, 1000);   // 購買、捕獲、解鎖後一秒內就會跳出成就
   setInterval(() => {
-    if (!rare && !tut && !document.hidden && activeData().unlocked && Math.random() < RARE_CHANCE) spawnRare();
+    if (!rare && !tut && !document.hidden && activeData().unlocked && Math.random() < rareChance()) spawnRare();
   }, 1000);
 
   // 分頁切走後回來：補發這段時間的收益
