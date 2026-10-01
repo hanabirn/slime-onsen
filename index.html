@@ -535,7 +535,10 @@
   .daily .reward-line.rb { color: #b77ad6; }
 
   /* 設定 */
-  .modal.settings { text-align: left; max-width: 360px; }
+  .modal.settings { text-align: left; max-width: 400px; }
+  .set-row.lang-row { flex-wrap: wrap; }                 /* 語言按鈕放到下一行，文字才不會被擠成好幾行 */
+  .set-row.lang-row .mini-btns { width: 100%; }
+  .set-row.lang-row .mini-btn { flex: 1; }
   .modal.settings h3 { text-align: center; margin-bottom: 14px; }
   .set-row {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -544,18 +547,30 @@
   .set-row:last-of-type { border-bottom: none; }
   .set-row .t b { display: block; }
   .set-row .t small { opacity: .65; font-size: .76rem; }
-  .switch {
-    position: relative; width: 54px; height: 30px; flex: none; margin: 0 !important; padding: 0 !important;
-    border-radius: 999px !important; background: #d9cfc3 !important; box-shadow: inset 0 2px 3px rgba(0,0,0,.1) !important;
-    transition: background .2s;
+  /* 音量滑桿 */
+  .vol { display: flex; align-items: center; gap: 8px; flex: none; width: 150px; }
+  .vol .vol-ico { font-size: 1.1rem; width: 22px; text-align: center; cursor: pointer; }
+  .vol .vol-val { font-size: .74rem; width: 34px; text-align: right; opacity: .75; }
+  .vol input[type="range"] {
+    flex: 1; min-width: 0; height: 26px; margin: 0; background: transparent; cursor: pointer;
+    -webkit-appearance: none; appearance: none;
   }
-  .switch::after {
-    content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px;
-    background: #fff; border-radius: 50%; box-shadow: 0 2px 3px rgba(0,0,0,.2);
-    transition: transform .2s cubic-bezier(.3,1.5,.6,1);
+  .vol input[type="range"]::-webkit-slider-runnable-track {
+    height: 10px; border-radius: 10px;
+    background: linear-gradient(90deg, #9ad9a8 var(--p, 50%), #e6dccf var(--p, 50%));
   }
-  .switch[aria-checked="true"] { background: #9ad9a8 !important; }
-  .switch[aria-checked="true"]::after { transform: translateX(24px); }
+  .vol input[type="range"]::-moz-range-track { height: 10px; border-radius: 10px; background: #e6dccf; }
+  .vol input[type="range"]::-moz-range-progress { height: 10px; border-radius: 10px; background: #9ad9a8; }
+  .vol input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px; margin-top: -6px; border-radius: 50%;
+    background: #fff; border: 3px solid var(--wood); box-shadow: 0 2px 3px rgba(0,0,0,.2);
+  }
+  .vol input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; border: 3px solid var(--wood); box-shadow: 0 2px 3px rgba(0,0,0,.2);
+  }
+  /* 語言切換 */
+  .modal .mini-btn.on { border-color: #e98fa2; background: #fff0f3; box-shadow: 0 3px 0 #e98fa2; }
   .modal .danger-btn {
     margin: 0; background: #fff; color: #d0677d; border: 2px solid #f0b3c0;
     box-shadow: 0 3px 0 #f0b3c0; padding: 7px 14px; font-size: .85rem; flex: none;
@@ -584,7 +599,7 @@
   }
 
   /* ===== 成就 ===== */
-  .ach-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .ach-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
   .ach {
     display: flex; gap: 12px; align-items: center;
     background: var(--soft); border: 3px solid var(--wood-light); border-radius: 20px;
@@ -607,7 +622,8 @@
   .ach .adesc { font-size: .76rem; opacity: .75; margin: 2px 0 5px; }
   .ach .bar { height: 8px; background: #eee5da; border-radius: 8px; overflow: hidden; }
   .ach .bar i { display: block; height: 100%; background: linear-gradient(90deg, #9ad9a8, #7fc9b4); border-radius: 8px; }
-  .ach .meta { display: flex; justify-content: space-between; font-size: .72rem; margin-top: 4px; opacity: .8; gap: 6px; }
+  .ach .meta { display: flex; justify-content: space-between; font-size: .72rem; margin-top: 4px; opacity: .8; gap: 2px 6px; flex-wrap: wrap; }
+  .ach .meta span { white-space: nowrap; }   /* 「0 / 200」不要被拆成兩行，太窄時整段換行 */
   .ach .claim {
     flex: none; font: inherit; font-weight: bold; font-size: .85rem; color: #fff; cursor: pointer;
     background: #e98fa2; border: none; border-radius: 14px; padding: 10px 14px; min-height: 44px;
@@ -792,6 +808,41 @@
   .modal .ward-item.locked small { color: #b77ad6; opacity: 1; font-weight: bold; }
   .dress-msg { min-height: 1.2em; font-size: .78rem; margin: 8px 0 0; color: #b77ad6; }
 
+  /* ===== 新手教學 ===== */
+  .tut-layer { position: fixed; inset: 0; z-index: 950; }      /* 透明的擋板：教學中不能點到遊戲 */
+  .tut-spot {
+    position: fixed; border-radius: 20px; pointer-events: none;
+    border: 3px solid #fff; box-shadow: 0 0 0 9999px rgba(70,50,38,.58), 0 0 18px rgba(255,255,255,.7);
+    /* 不加 transition：畫面捲動時打亮框要緊貼目標，不能落後 */
+  }
+  .tut-spot.none { display: none; }                          /* 沒有目標的步驟（歡迎畫面）改由整層變暗 */
+  .tut-layer.dim { background: rgba(70,50,38,.58); }
+  .tut-card {
+    position: fixed; width: min(340px, calc(100vw - 32px));
+    background: var(--soft); border: 4px solid var(--wood-light); border-radius: 22px;
+    padding: 16px 18px 14px; text-align: center; box-shadow: 0 8px 24px rgba(60,40,30,.3);
+    animation: pop .3s cubic-bezier(.3,1.6,.6,1);
+  }
+  .tut-card .tut-slime { font-size: 2rem; line-height: 1; }
+  .tut-card h3 { margin: 6px 0 4px; font-size: 1.05rem; }
+  .tut-card p { margin: 0; font-size: .86rem; line-height: 1.6; }
+  .tut-card .tut-langs { display: flex; gap: 6px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
+  .tut-card .tut-langs button {
+    font: inherit; font-size: .82rem; cursor: pointer; color: var(--text); padding: 6px 12px; border-radius: 12px;
+    background: #fff; border: 2px solid var(--wood-light); box-shadow: 0 3px 0 var(--wood-light);
+  }
+  .tut-card .tut-langs button.on { border-color: #e98fa2; background: #fff0f3; box-shadow: 0 3px 0 #e98fa2; }
+  .tut-card .tut-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; gap: 8px; }
+  .tut-card .tut-step { font-size: .75rem; opacity: .6; }
+  .tut-card .tut-skip {
+    font: inherit; font-size: .8rem; background: none; border: none; color: var(--text); opacity: .6; cursor: pointer; padding: 8px;
+  }
+  .tut-card .tut-next {
+    font: inherit; font-weight: bold; color: #fff; cursor: pointer; min-height: 42px;
+    background: #7fb3c9; border: none; border-radius: 14px; padding: 8px 20px; box-shadow: 0 4px 0 #5e93a9;
+  }
+  .tut-card .tut-next:active { transform: translateY(2px); box-shadow: 0 2px 0 #5e93a9; }
+
   /* ===== 手機版 ===== */
   @media (max-width: 640px) {
     body { padding: 12px 12px 28px; }
@@ -843,76 +894,93 @@
 <!-- 背景音樂：bgm.mp3 需與此 html 放在同一個資料夾 -->
 <audio id="bgm" src="bgm.mp3" loop preload="auto"></audio>
 <div class="top-btns">
-  <button class="round-btn" id="gift-btn" aria-label="每日登入獎勵" title="每日登入獎勵">
+  <button class="round-btn" id="gift-btn" data-i18n-attr="aria-label,title:btn.gift">
     🎁<span class="dot" id="gift-dot" hidden></span>
   </button>
-  <button class="round-btn" id="gear-btn" aria-label="遊戲設定" title="遊戲設定"><span>⚙️</span></button>
-  <button class="round-btn music-btn" id="music-btn" aria-label="背景音樂開關" title="背景音樂開關">
+  <button class="round-btn" id="gear-btn" data-i18n-attr="aria-label,title:btn.settings"><span>⚙️</span></button>
+  <button class="round-btn music-btn" id="music-btn" data-i18n-attr="aria-label:btn.music">
     <span class="note">♪</span>
-    <span class="label">點一下開始音樂</span>
+    <span class="label" data-i18n="music.tapToStart"></span>
   </button>
 </div>
 
 <!-- 設定視窗 -->
 <div class="modal-bg" id="settings-bg" hidden>
-  <div class="modal settings" role="dialog" aria-label="遊戲設定">
-    <h3>⚙️ 遊戲設定</h3>
-    <div class="set-row">
-      <div class="t"><b>🔔 按鈕音效</b><small>點擊、購買時的「啵」「叮」聲</small></div>
-      <button class="switch" id="sfx-switch" role="switch" aria-checked="true" aria-label="音效開關"></button>
+  <div class="modal settings" role="dialog" data-i18n-attr="aria-label:btn.settings">
+    <h3 data-i18n="set.title"></h3>
+    <div class="set-row lang-row">
+      <div class="t"><b>🌐 Language</b><small data-i18n="set.langSub"></small></div>
+      <div class="mini-btns" id="lang-btns"></div>
     </div>
     <div class="set-row">
-      <div class="t"><b>💾 存檔碼</b><small>換電腦、清快取前先備份進度</small></div>
+      <div class="t"><b data-i18n="set.music"></b><small data-i18n="set.musicSub"></small></div>
+      <div class="vol">
+        <span class="vol-ico" id="music-vol-ico" data-i18n-attr="title:set.mute">🎵</span>
+        <input type="range" id="music-vol" min="0" max="100" step="5" data-i18n-attr="aria-label:set.music">
+        <span class="vol-val" id="music-vol-val"></span>
+      </div>
+    </div>
+    <div class="set-row">
+      <div class="t"><b data-i18n="set.sfx"></b><small data-i18n="set.sfxSub"></small></div>
+      <div class="vol">
+        <span class="vol-ico" id="sfx-vol-ico" data-i18n-attr="title:set.mute">🔔</span>
+        <input type="range" id="sfx-vol" min="0" max="100" step="5" data-i18n-attr="aria-label:set.sfx">
+        <span class="vol-val" id="sfx-vol-val"></span>
+      </div>
+    </div>
+    <div class="set-row">
+      <div class="t"><b data-i18n="set.save"></b><small data-i18n="set.saveSub"></small></div>
       <div class="mini-btns">
-        <button class="mini-btn" id="export-btn">匯出</button>
-        <button class="mini-btn" id="import-btn">匯入</button>
+        <button class="mini-btn" id="export-btn" data-i18n="set.export"></button>
+        <button class="mini-btn" id="import-btn" data-i18n="set.import"></button>
       </div>
     </div>
     <div class="save-panel" id="save-panel" hidden>
-      <textarea id="save-code" spellcheck="false" aria-label="存檔碼"></textarea>
+      <textarea id="save-code" spellcheck="false" data-i18n-attr="aria-label:set.save"></textarea>
       <div class="row">
         <p class="msg" id="save-msg"></p>
-        <button id="save-action">複製</button>
+        <button id="save-action"></button>
       </div>
     </div>
     <div class="set-row">
-      <div class="t"><b>🧹 重置遊戲資料</b><small>清除所有進度，從頭開始經營</small></div>
-      <button class="danger-btn" id="reset">重置</button>
+      <div class="t"><b data-i18n="set.tutorial"></b><small data-i18n="set.tutorialSub"></small></div>
+      <button class="mini-btn" id="tutorial-btn" data-i18n="set.tutorialBtn"></button>
+    </div>
+    <div class="set-row">
+      <div class="t"><b data-i18n="set.reset"></b><small data-i18n="set.resetSub"></small></div>
+      <button class="danger-btn" id="reset" data-i18n="set.resetBtn"></button>
     </div>
     <div class="about">
-      <b>♨ 史萊姆溫泉度假村 ♨</b><br>
-      這是屬於<b>你</b>的療癒溫泉度假村<br>
-      版本 <span id="version"></span> · 開業日 <span id="since"></span>
-      <div class="credit">
-        🎵 背景音樂：「Japanese Calm Piano」<br>
-        作曲：pianocafe_kumi · 來源：Pixabay
-      </div>
+      <b data-i18n="about.name"></b><br>
+      <span data-i18n-html="about.line"></span><br>
+      <span id="about-ver"></span>
+      <div class="credit" data-i18n-html="about.credit"></div>
     </div>
-    <button class="close-btn" id="settings-close">關閉</button>
+    <button class="close-btn" id="settings-close" data-i18n="close"></button>
   </div>
 </div>
 
 <!-- 史萊姆命名 / 換裝視窗 -->
 <div class="modal-bg" id="dress-bg" hidden>
-  <div class="modal dress" role="dialog" aria-label="史萊姆換裝">
+  <div class="modal dress" role="dialog" data-i18n-attr="aria-label:dress.aria">
     <div class="dress-preview"><div class="mini-slime" id="dress-preview"></div></div>
     <label class="name-field">
-      <span>名字</span>
-      <input id="dress-name" maxlength="8" autocomplete="off" placeholder="幫牠取個名字">
+      <span data-i18n="dress.name"></span>
+      <input id="dress-name" maxlength="8" autocomplete="off" data-i18n-attr="placeholder:dress.placeholder">
     </label>
-    <div class="wardrobe-title">🎩 帽子 <small>（🌈 彩虹金幣：<b id="dress-rainbow">0</b>）</small></div>
+    <div class="wardrobe-title"><span data-i18n="dress.hats"></span> <small>（🌈 <b id="dress-rainbow">0</b>）</small></div>
     <div class="wardrobe" id="wardrobe-hats"></div>
-    <div class="wardrobe-title">🧺 毛巾</div>
+    <div class="wardrobe-title" data-i18n="dress.towels"></div>
     <div class="wardrobe" id="wardrobe-towels"></div>
     <p class="dress-msg" id="dress-msg"></p>
-    <button id="dress-close">完成</button>
+    <button id="dress-close" data-i18n="dress.done"></button>
   </div>
 </div>
 
 <div class="wrap">
   <header>
     <div class="noren"><i></i><i></i><i></i><i></i><i></i></div>
-    <h1>♨ 史萊姆<span>溫泉</span>度假村 ♨</h1>
+    <h1 data-i18n-html="h1">♨ 史萊姆<span>溫泉</span>度假村 ♨</h1>
     <div class="header-badges">
       <span class="badge season" id="season-badge" hidden></span>
       <span class="badge lantern" id="lantern-badge" hidden></span>
@@ -920,10 +988,10 @@
   </header>
 
   <div class="stats">
-    <div class="stat"><small>溫泉幣</small><b id="coins">0</b></div>
-    <div class="stat"><small>每秒產出</small><b id="cps">0</b></div>
-    <div class="stat"><small>每次撈取</small><b id="cpc">0</b></div>
-    <div class="stat"><small>🌈 彩虹金幣（<span id="rps">0</span>/秒）</small><b id="rainbow">0</b></div>
+    <div class="stat"><small data-i18n="stat.coins"></small><b id="coins">0</b></div>
+    <div class="stat"><small data-i18n="stat.cps"></small><b id="cps">0</b></div>
+    <div class="stat"><small data-i18n="stat.cpc"></small><b id="cpc">0</b></div>
+    <div class="stat"><small id="rainbow-label"></small><b id="rainbow">0</b></div>
   </div>
 
   <div class="pool-tabs" id="pool-tabs"></div>
@@ -934,20 +1002,20 @@
       <div class="big" id="lock-icon">🔒</div>
       <h3 id="lock-name"></h3>
       <p id="lock-desc"></p>
-      <button id="unlock-btn">解鎖</button>
+      <button id="unlock-btn"></button>
     </div>
     <div id="pool">
       <div class="fx" id="fx"></div>
-      <div class="hint">點擊溫泉撈溫泉幣 ✦</div>
+      <div class="hint" data-i18n="pool.hint"></div>
     </div>
   </div>
 
-  <h2>🛠 度假村升級</h2>
+  <h2 data-i18n="shop.title"></h2>
   <div class="shop">
     <button class="item" id="buy-pool">
       <div class="icon" id="pool-icon">🏞️</div>
       <div class="info">
-        <div class="name" id="pool-upg-name">擴建溫泉水池</div>
+        <div class="name" id="pool-upg-name"></div>
         <div class="desc" id="pool-upg-desc"></div>
         <div class="cost">💰 <span id="cost-pool">0</span></div>
       </div>
@@ -956,8 +1024,8 @@
     <button class="item" id="buy-duck">
       <div class="icon">🐤</div>
       <div class="info">
-        <div class="name">購買黃色小鴨</div>
-        <div class="desc">史萊姆們超開心！所有收益 +25%（可疊加）</div>
+        <div class="name" data-i18n="upg.duck"></div>
+        <div class="desc" data-i18n="upg.duckDesc"></div>
         <div class="cost">💰 <span id="cost-duck">0</span></div>
       </div>
       <div class="lv">×<span id="lv-duck">0</span></div>
@@ -965,8 +1033,8 @@
     <button class="item" id="buy-snack">
       <div class="icon">🍡</div>
       <div class="info">
-        <div class="name">史萊姆點心吧</div>
-        <div class="desc">泡完湯來串糰子！每級每秒產出 0.1 彩虹金幣</div>
+        <div class="name" data-i18n="upg.snack"></div>
+        <div class="desc" data-i18n="upg.snackDesc"></div>
         <div class="cost">💰 <span id="cost-snack">0</span></div>
       </div>
       <div class="lv">Lv.<span id="lv-snack">0</span></div>
@@ -974,72 +1042,558 @@
     <button class="item" id="buy-chair">
       <div class="icon">💺</div>
       <div class="info">
-        <div class="name">豪華按摩椅</div>
-        <div class="desc">放鬆後手更有力！每級手動撈取量 +100%</div>
+        <div class="name" data-i18n="upg.chair"></div>
+        <div class="desc" data-i18n="upg.chairDesc"></div>
         <div class="cost rainbow">🌈 <span id="cost-chair">0</span></div>
       </div>
       <div class="lv">Lv.<span id="lv-chair">0</span></div>
     </button>
   </div>
 
-  <h2>🏮 溫泉祭</h2>
+  <h2 data-i18n="fest.title"></h2>
   <div class="festival" id="festival">
     <div class="fest-lanterns" id="fest-lanterns"></div>
     <div class="fest-info">
-      <div>擁有祭典燈籠 <b id="fest-owned">0</b> 個 · 所有收益 <b id="fest-bonus">+0%</b></div>
-      <div class="fest-sub">本輪累計賺得 💰<span id="fest-earned">0</span> · 舉辦後可獲得 <b id="fest-gain">0</b> 個燈籠</div>
+      <div id="fest-line1"></div>
+      <div class="fest-sub" id="fest-line2"></div>
       <div class="fest-sub" id="fest-next"></div>
     </div>
-    <button class="fest-btn" id="fest-btn" data-sfx="own">舉辦溫泉祭</button>
+    <button class="fest-btn" id="fest-btn" data-sfx="own" data-i18n="fest.btn"></button>
   </div>
 
   <div class="dex-head">
-    <h2>🏠 史萊姆之家</h2>
+    <h2 data-i18n="house.title"></h2>
     <small id="house-pool"></small>
   </div>
-  <p class="section-tip">點選史萊姆可以幫牠取名字、用 🌈 彩虹金幣換裝喔！</p>
+  <p class="section-tip" data-i18n="house.tip"></p>
   <div class="house" id="house"></div>
 
   <div class="dex-head">
-    <h2>📖 稀有史萊姆圖鑑</h2>
-    <small>已發現 <span id="dex-found">0</span> / <span id="dex-total">0</span></small>
+    <h2 data-i18n="dex.title"></h2>
+    <small id="dex-count"></small>
   </div>
   <div class="dex" id="dex"></div>
 
   <div class="dex-head">
-    <h2>🏆 度假村成就</h2>
-    <small>已達成 <span id="ach-done">0</span> / <span id="ach-total">0</span></small>
+    <h2 data-i18n="ach.title"></h2>
+    <small id="ach-count"></small>
   </div>
   <div class="ach-list" id="ach-list"></div>
 
-  <footer>
-    進度會自動儲存在瀏覽器中 · 右上角 ⚙️ 可以調整設定
-  </footer>
+  <footer data-i18n="footer"></footer>
 </div>
 
 <script>
 (() => {
   const SAVE_KEY = 'slimeOnsenSave_v1';
   const OFFLINE_CAP_SEC = 8 * 60 * 60;  // 離線收益最多計算 8 小時
-  const VERSION = '2.0.0';
+  const VERSION = '2.1.0';
+
+  // ===== 多語言 =====
+  // 字串裡的 {名稱} 會被替換成參數；找不到的字串會退回繁體中文。
+  const I18N = {
+    zh: {
+      'title': '史萊姆溫泉度假村',
+      'h1': '♨ 史萊姆<span>溫泉</span>度假村 ♨',
+      'btn.gift': '每日登入獎勵', 'btn.settings': '遊戲設定', 'btn.music': '背景音樂開關',
+      'music.tapToStart': '點一下開始音樂', 'music.missing': '找不到 bgm.mp3',
+      'music.pause': '暫停音樂', 'music.play': '播放音樂',
+      'set.title': '⚙️ 遊戲設定', 'set.langSub': '切換遊戲語言',
+      'set.music': '🎵 背景音樂', 'set.musicSub': '拉到最左邊就是靜音',
+      'set.sfx': '🔔 按鈕音效', 'set.sfxSub': '點擊、購買時的「啵」「叮」聲', 'set.mute': '點一下靜音／恢復',
+      'set.save': '💾 存檔碼', 'set.saveSub': '換電腦、清快取前先備份進度',
+      'set.export': '匯出', 'set.import': '匯入', 'set.copy': '複製',
+      'set.tutorial': '📘 新手教學', 'set.tutorialSub': '再看一次遊戲玩法說明', 'set.tutorialBtn': '重看',
+      'set.reset': '🧹 重置遊戲資料', 'set.resetSub': '清除所有進度，從頭開始經營',
+      'set.resetBtn': '重置', 'set.resetConfirm': '確定要重置？',
+      'about.name': '♨ 史萊姆溫泉度假村 ♨', 'about.line': '這是屬於<b>你</b>的療癒溫泉度假村',
+      'about.ver': '版本 {v} · 開業日 {d}',
+      'about.credit': '🎵 背景音樂：「Japanese Calm Piano」<br>作曲：pianocafe_kumi · 來源：Pixabay',
+      'close': '關閉',
+      'save.exportMsg': '請把這串存檔碼複製起來，貼到記事本或傳給自己保存。',
+      'save.importMsg': '貼上存檔碼後按「匯入」，目前的進度會被取代。',
+      'save.copied': '✅ 已複製到剪貼簿！',
+      'save.invalid': '❌ 這不是有效的存檔碼，請確認有完整貼上。',
+      'save.confirmBtn': '確定匯入',
+      'save.preview': '存檔內容：💰{c}、🌈{r}。再按一次確定取代目前進度。',
+      'save.done': '💾 存檔匯入成功！歡迎回來～',
+      'reset.done': '🌱 度假村重新開幕！',
+      'dress.aria': '史萊姆換裝', 'dress.name': '名字', 'dress.placeholder': '幫牠取個名字',
+      'dress.hats': '🎩 帽子', 'dress.towels': '🧺 毛巾', 'dress.done': '完成',
+      'dress.short': '彩虹金幣不夠喔～還差 🌈{n}',
+      'dress.bought': '買到了「{name}」！所有史萊姆都可以穿喔',
+      'dress.happy': '{name}覺得很開心♡',
+      'house.title': '🏠 史萊姆之家', 'house.guests': '{icon} {pool}的住客',
+      'house.tip': '點選史萊姆可以幫牠取名字、用 🌈 彩虹金幣換裝喔！', 'house.edit': '✏️ 取名・換裝',
+      'stat.coins': '溫泉幣', 'stat.cps': '每秒產出', 'stat.cpc': '每次撈取', 'stat.rainbow': '🌈 彩虹金幣（{n}/秒）',
+      'pool.hint': '點擊溫泉撈溫泉幣 ✦',
+      'shop.title': '🛠 度假村升級',
+      'upg.pool': '擴建{pool}',
+      'upg.poolDesc': '每級 +{ps}/秒、撈取 +{pc}；每 3 級有新史萊姆入住',
+      'upg.locked': '需要先解鎖這座溫泉池',
+      'upg.duck': '購買黃色小鴨', 'upg.duckDesc': '史萊姆們超開心！所有收益 +25%（可疊加）',
+      'upg.snack': '史萊姆點心吧', 'upg.snackDesc': '泡完湯來串糰子！每級每秒產出 0.1 彩虹金幣',
+      'upg.chair': '豪華按摩椅', 'upg.chairDesc': '放鬆後手更有力！每級手動撈取量 +100%',
+      'tab.info': '+{ps}/秒 · Lv.{lv}',
+      'unlock.btn': '解鎖 💰 {n}',
+      'unlock.desc': '解鎖後每秒 +{ps} 溫泉幣、每次撈取 +{pc}，還會有新的史萊姆入住！',
+      'unlock.toast': '🎉 {pool} 開幕了！', 'unlock.say': '新溫泉耶！衝啊～',
+      'fest.title': '🏮 溫泉祭', 'fest.btn': '舉辦溫泉祭',
+      'fest.owned': '擁有祭典燈籠 <b>{n}</b> 個 · 所有收益 <b>+{p}%</b>',
+      'fest.earned': '本輪累計賺得 💰{e} · 舉辦後可獲得 <b>{g}</b> 個燈籠',
+      'fest.next': '再賺 💰{n} 可以多拿 1 個燈籠',
+      'fest.badge': '🏮 祭典燈籠 ×{n}・所有收益 +{p}%',
+      'fest.confirmTitle': '要舉辦溫泉祭嗎？',
+      'fest.confirmText': '史萊姆們會放天燈慶祝，度假村重新開始經營，<br>但你會獲得永久加成！',
+      'fest.gain': '🏮 +{n} 個祭典燈籠',
+      'fest.incomeChange': '所有收益：+{a}% → <b>+{b}%</b>',
+      'fest.resets': '🔄 <b>會重置：</b>溫泉幣、彩虹金幣、溫泉池（等級與解鎖）、小鴨、點心吧、按摩椅',
+      'fest.keeps': '💖 <b>會保留：</b>祭典燈籠、圖鑑、成就、史萊姆的名字與衣櫃、每日登入',
+      'fest.go': '舉辦溫泉祭！', 'fest.cancel': '再想想',
+      'fest.toast': '🎆 第 {n} 屆溫泉祭大成功！收益 +{p}%',
+      'ach.title': '🏆 度假村成就', 'ach.count': '已達成 {a} / {b}',
+      'ach.claim': '領取', 'ach.claimed': '✓ 已領取',
+      'ach.reward': '🌈{r} ＋ 💰{m}分鐘產出',
+      'ach.toast': '🏆 達成成就「{name}」！', 'ach.claimToast': '🎉 領取 💰{c} ＋ 🌈{r}', 'ach.say': '老闆好厲害！✨',
+      'ach.clicker.name': '勤勞的撈金小幫手', 'ach.clicker.desc': '手動撈溫泉 200 次',
+      'ach.pet.name': '史萊姆好朋友', 'ach.pet.desc': '摸摸史萊姆 50 次',
+      'ach.namer.name': '命名大師', 'ach.namer.desc': '幫 3 隻史萊姆取名字',
+      'ach.ducks.name': '小鴨大家族', 'ach.ducks.desc': '擁有 5 隻黃色小鴨',
+      'ach.rare10.name': '稀客常來', 'ach.rare10.desc': '捕獲稀有史萊姆 10 次',
+      'ach.clicker2.name': '撈金達人', 'ach.clicker2.desc': '手動撈溫泉 2,000 次',
+      'ach.snack10.name': '糰子名店', 'ach.snack10.desc': '點心吧升到 Lv.10',
+      'ach.chair5.name': '極致放鬆', 'ach.chair5.desc': '按摩椅升到 Lv.5',
+      'ach.fashion.name': '時尚衣櫃', 'ach.fashion.desc': '收集 10 件帽子或毛巾',
+      'ach.daily7.name': '一週常客', 'ach.daily7.desc': '連續登入 7 天',
+      'ach.poolLv.name': '溫泉擴建王', 'ach.poolLv.desc': '所有溫泉池等級合計 30',
+      'ach.earn1m.name': '百萬富翁', 'ach.earn1m.desc': '累計賺得 100 萬溫泉幣',
+      'ach.tycoon.name': '溫泉度假村大亨', 'ach.tycoon.desc': '解鎖全部溫泉池',
+      'ach.dex.name': '稀有史萊姆收藏家', 'ach.dex.desc': '發現全部常駐稀有史萊姆（不含季節限定）',
+      'ach.rare50.name': '稀有史萊姆獵人', 'ach.rare50.desc': '捕獲稀有史萊姆 50 次',
+      'ach.fest1.name': '第一次溫泉祭', 'ach.fest1.desc': '舉辦 1 次溫泉祭',
+      'ach.earn1b.name': '溫泉億萬富翁', 'ach.earn1b.desc': '累計賺得 10 億溫泉幣',
+      'ach.fest5.name': '祭典名人', 'ach.fest5.desc': '舉辦 5 次溫泉祭',
+      'say.duck': '哇～小鴨鴨！🐤', 'say.snackOpen': '點心吧開張了！🍡', 'say.snack': '糰子好好吃～🍡',
+      'say.chair': '按摩椅…咕嚕嚕嚕嚕～💺',
+      'say.join': '我是{name}，我也來泡湯囉！', 'say.iam': '我是{name}！', 'say.love': '{name}最喜歡老闆了♡',
+      'daily.title': '每日登入獎勵', 'daily.claimed': '今天已經領過囉！',
+      'daily.streak': '連續登入第 <b>{n}</b> 天', 'daily.gift': '，史萊姆們準備了禮物～', 'daily.tomorrow': '，明天再來喔♪',
+      'daily.day': '第{n}天', 'daily.claim': '領取！', 'daily.later': '稍後再領', 'daily.ok': '好的',
+      'daily.note': '中斷一天沒登入，會從第 1 天重新開始',
+      'daily.toast': '🎁 領到第 {n} 天的登入獎勵！', 'daily.say': '老闆今天也來了！♡',
+      'reward.coins': '💰 {n} 溫泉幣', 'reward.rainbow': '🌈 {n} 彩虹金幣',
+      'off.title': '歡迎回來！', 'off.away': '你離開了 {t}', 'off.cap': '（最多計算 8 小時）',
+      'off.earned': '史萊姆們幫你顧店，賺到了：', 'off.ok': '收下！',
+      'time.hm': '{h} 小時 {m} 分', 'time.ms': '{m} 分 {s} 秒', 'time.s': '{s} 秒',
+      'rare.appear': '✨ {name}出現了！快點牠！', 'rare.bye': '掰掰～', 'rare.thanks': '謝謝光臨♡',
+      'rare.new': '📖 新發現：{name}！', 'rare.again': '{name}（第 {n} 次）',
+      'dex.title': '📖 稀有史萊姆圖鑑', 'dex.count': '已發現 {a} / {b}',
+      'dex.seen': '已遇見 {n} 次', 'dex.active': '出沒中！快找找', 'dex.when': '{when}出現',
+      'dex.unknown': '尚未發現', 'dex.limited': '季節限定',
+      'footer': '進度會自動儲存在瀏覽器中 · 右上角 ⚙️ 可以調整設定',
+      'tut.next': '下一步', 'tut.skip': '跳過教學', 'tut.start': '開始經營！',
+      'tut.welcomeTitle': '歡迎來到史萊姆溫泉度假村！',
+      'tut.welcome': '從今天起，你就是這間溫泉的老闆♨<br>先花 30 秒認識一下吧～',
+      'tut.poolTitle': '💧 點擊溫泉',
+      'tut.pool': '點一下溫泉就能撈到溫泉幣！摸摸史萊姆，牠們會很開心。看到閃閃發光的稀有史萊姆，要趕快點牠喔！',
+      'tut.statsTitle': '📊 你的收入',
+      'tut.stats': '這裡顯示溫泉幣、每秒自動產出和每次撈取的量。🌈 彩虹金幣可以買按摩椅和可愛的衣服。',
+      'tut.shopTitle': '🛠 升級度假村',
+      'tut.shop': '用溫泉幣擴建溫泉池、買小鴨，收入就會越來越多。買得起的項目會亮起來喔！',
+      'tut.tabsTitle': '🌸 更多溫泉池',
+      'tut.tabs': '存夠溫泉幣就能解鎖新的溫泉池，還會有新的史萊姆入住！',
+      'tut.houseTitle': '🏠 史萊姆之家',
+      'tut.house': '幫史萊姆取名字，再換上可愛的帽子和毛巾吧！',
+      'tut.topTitle': '🎁 右上角的按鈕',
+      'tut.top': '🎁 每天領登入獎勵、⚙️ 設定（語言、音量、存檔）、♪ 背景音樂。<br>就算關掉遊戲，史萊姆也會幫你顧店喔！',
+      'pool.forest.name': '森林露天風呂', 'pool.sakura.name': '櫻花溫泉', 'pool.aurora.name': '極光冰晶池',
+      'pool.forest.lines': ['森林的空氣好清新～', '聽到小鳥在唱歌♪'],
+      'pool.sakura.lines': ['花瓣掉進湯裡了～🌸', '邊賞花邊泡湯♡', '粉紅色的好療癒'],
+      'pool.aurora.lines': ['哇…極光好美…✨', '外面好冷，湯好暖！', '頭頂結霜了❄️'],
+      'lines': [
+        '呼～好舒服喔～', '泡到融化了…', '溫度剛剛好♪', '啵嚕啵嚕～',
+        '今天也辛苦了', '想喝牛奶！🥛', '整隻都軟掉了', 'ㄆㄨㄆㄨ～',
+        '再泡五分鐘…', '好想睡喔 zzZ', '這裡是天堂吧', '皮膚變Q彈了！',
+        '要不要一起泡？', '♨ 極樂極樂 ♨',
+      ],
+      'petLines': [
+        '嘿嘿，好癢喔～', '再摸一下嘛♡', '噗嚕噗嚕！', '最喜歡老闆了！',
+        '被發現了～', '嗚哇！嚇一跳', '軟綿綿的吧？', '要一起泡嗎？♡',
+      ],
+      'names.forest': ['小綠', '桃桃', '藍藍', '布丁', '葡萄', '橘子'],
+      'names.sakura': ['櫻櫻', '小桃', '莓莓', '奶油', '紫藤', '杏仁'],
+      'names.aurora': ['冰冰', '雪球', '星星', '薰衣', '薄荷', '雲朵'],
+      'hat.none': '不戴', 'hat.ribbon': '蝴蝶結', 'hat.flower': '小花', 'hat.cap': '棒球帽',
+      'hat.strawberry': '草莓', 'hat.strawhat': '草帽', 'hat.grad': '學士帽', 'hat.crown': '小皇冠',
+      'towel.default': '原色', 'towel.none': '不戴', 'towel.pink': '粉紅', 'towel.mint': '薄荷',
+      'towel.sky': '天空', 'towel.lavender': '薰衣草', 'towel.lemon': '檸檬', 'towel.stripe': '條紋',
+      'rare.gold.name': '金幣史萊姆', 'rare.gold.hello': '撿到我會發財喔！',
+      'rare.rainbow.name': '彩虹史萊姆', 'rare.rainbow.hello': '七彩的泡泡～',
+      'rare.sakura.name': '櫻花史萊姆', 'rare.sakura.hello': '春天來泡湯了♪',
+      'rare.king.name': '國王史萊姆', 'rare.king.hello': '本王駕到！',
+      'rare.dango.name': '糰子史萊姆', 'rare.dango.hello': '三色糰子來泡湯～',
+      'rare.watermelon.name': '西瓜史萊姆', 'rare.watermelon.hello': '夏天就是要吃西瓜！',
+      'rare.maple.name': '楓葉史萊姆', 'rare.maple.hello': '秋天的楓葉好漂亮～',
+      'rare.snowman.name': '雪人史萊姆', 'rare.snowman.hello': '泡湯不會融化吧…？',
+      'rare.santa.name': '聖誕帽史萊姆', 'rare.santa.hello': 'Merry Christmas！🎄',
+      'rarity.spring': '春季限定', 'rarity.summer': '夏季限定', 'rarity.autumn': '秋季限定',
+      'rarity.winter': '冬季限定', 'rarity.xmas': '聖誕限定',
+      'season.spring.label': '🌸 春季限定：糰子史萊姆出沒中！', 'season.spring.when': '春天（3～5 月）',
+      'season.summer.label': '🎐 夏季限定：西瓜史萊姆出沒中！', 'season.summer.when': '夏天（6～8 月）',
+      'season.autumn.label': '🍁 秋季限定：楓葉史萊姆出沒中！', 'season.autumn.when': '秋天（9～11 月）',
+      'season.winter.label': '⛄ 冬季限定：雪人史萊姆出沒中！', 'season.winter.when': '冬天（12～2 月）',
+      'season.xmas.label': '🎄 聖誕限定：聖誕帽史萊姆出沒中！', 'season.xmas.when': '聖誕節（12/1～12/25）',
+    },
+
+    en: {
+      'title': 'Slime Onsen Resort',
+      'h1': '♨ Slime <span>Onsen</span> Resort ♨',
+      'btn.gift': 'Daily login bonus', 'btn.settings': 'Settings', 'btn.music': 'Toggle music',
+      'music.tapToStart': 'Tap to start music', 'music.missing': 'bgm.mp3 not found',
+      'music.pause': 'Pause music', 'music.play': 'Play music',
+      'set.title': '⚙️ Settings', 'set.langSub': 'Change the game language',
+      'set.music': '🎵 Music', 'set.musicSub': 'Slide all the way left to mute',
+      'set.sfx': '🔔 Sound effects', 'set.sfxSub': 'Pops and dings when you tap or buy', 'set.mute': 'Tap to mute / unmute',
+      'set.save': '💾 Save code', 'set.saveSub': 'Back up before switching devices or clearing data',
+      'set.export': 'Export', 'set.import': 'Import', 'set.copy': 'Copy',
+      'set.tutorial': '📘 Tutorial', 'set.tutorialSub': 'Replay the how-to-play guide', 'set.tutorialBtn': 'Replay',
+      'set.reset': '🧹 Reset game data', 'set.resetSub': 'Erase all progress and start over',
+      'set.resetBtn': 'Reset', 'set.resetConfirm': 'Really reset?',
+      'about.name': '♨ Slime Onsen Resort ♨', 'about.line': 'A cozy onsen resort that is all <b>yours</b>',
+      'about.ver': 'Version {v} · Opened {d}',
+      'about.credit': '🎵 Music: "Japanese Calm Piano"<br>by pianocafe_kumi · Source: Pixabay',
+      'close': 'Close',
+      'save.exportMsg': 'Copy this code and keep it somewhere safe, like a notes app.',
+      'save.importMsg': 'Paste a save code and press "Import". Your current progress will be replaced.',
+      'save.copied': '✅ Copied to clipboard!',
+      'save.invalid': '❌ That is not a valid save code. Make sure you pasted all of it.',
+      'save.confirmBtn': 'Confirm',
+      'save.preview': 'This save has 💰{c} and 🌈{r}. Press again to replace your current progress.',
+      'save.done': '💾 Save imported! Welcome back~',
+      'reset.done': '🌱 The resort has reopened!',
+      'dress.aria': 'Dress up slime', 'dress.name': 'Name', 'dress.placeholder': 'Give it a name',
+      'dress.hats': '🎩 Hats', 'dress.towels': '🧺 Towels', 'dress.done': 'Done',
+      'dress.short': 'Not enough rainbow coins~ You need 🌈{n} more',
+      'dress.bought': 'Got "{name}"! Every slime can wear it',
+      'dress.happy': '{name} is so happy♡',
+      'house.title': '🏠 Slime House', 'house.guests': '{icon} Guests of {pool}',
+      'house.tip': 'Tap a slime to name it and dress it up with 🌈 rainbow coins!', 'house.edit': '✏️ Name & dress',
+      'stat.coins': 'Onsen coins', 'stat.cps': 'Per second', 'stat.cpc': 'Per scoop', 'stat.rainbow': '🌈 Rainbow ({n}/s)',
+      'pool.hint': 'Tap the water to scoop coins ✦',
+      'shop.title': '🛠 Resort Upgrades',
+      'upg.pool': 'Expand {pool}',
+      'upg.poolDesc': '+{ps}/s and +{pc} per scoop each level; a new slime moves in every 3 levels',
+      'upg.locked': 'Unlock this pool first',
+      'upg.duck': 'Buy a rubber duck', 'upg.duckDesc': 'The slimes love it! All income +25% (stacks)',
+      'upg.snack': 'Slime Snack Bar', 'upg.snackDesc': 'Dango after a soak! +0.1 rainbow coins/s per level',
+      'upg.chair': 'Deluxe Massage Chair', 'upg.chairDesc': 'Relaxed hands scoop better! Scoop amount +100% per level',
+      'tab.info': '+{ps}/s · Lv.{lv}',
+      'unlock.btn': 'Unlock 💰 {n}',
+      'unlock.desc': 'Unlocking gives +{ps} coins/s and +{pc} per scoop, and new slimes move in!',
+      'unlock.toast': '🎉 {pool} is now open!', 'unlock.say': 'A new onsen! Let\'s go~',
+      'fest.title': '🏮 Onsen Festival', 'fest.btn': 'Hold Festival',
+      'fest.owned': 'Festival lanterns: <b>{n}</b> · All income <b>+{p}%</b>',
+      'fest.earned': 'Earned this run: 💰{e} · Hold it now for <b>{g}</b> lanterns',
+      'fest.next': 'Earn 💰{n} more for +1 lantern',
+      'fest.badge': '🏮 Lanterns ×{n} · All income +{p}%',
+      'fest.confirmTitle': 'Hold the Onsen Festival?',
+      'fest.confirmText': 'The slimes will release sky lanterns and the resort starts over,<br>but you get a permanent bonus!',
+      'fest.gain': '🏮 +{n} festival lanterns',
+      'fest.incomeChange': 'All income: +{a}% → <b>+{b}%</b>',
+      'fest.resets': '🔄 <b>Resets:</b> onsen coins, rainbow coins, pools (levels & unlocks), ducks, snack bar, massage chairs',
+      'fest.keeps': '💖 <b>Keeps:</b> lanterns, slime book, achievements, slime names & wardrobe, daily login',
+      'fest.go': 'Hold it!', 'fest.cancel': 'Maybe later',
+      'fest.toast': '🎆 Festival #{n} was a hit! Income +{p}%',
+      'ach.title': '🏆 Achievements', 'ach.count': 'Completed {a} / {b}',
+      'ach.claim': 'Claim', 'ach.claimed': '✓ Claimed',
+      'ach.reward': '🌈{r} + 💰{m} min of income',
+      'ach.toast': '🏆 Achievement unlocked: {name}!', 'ach.claimToast': '🎉 Got 💰{c} + 🌈{r}', 'ach.say': 'Boss, you\'re amazing! ✨',
+      'ach.clicker.name': 'Hard-Working Scooper', 'ach.clicker.desc': 'Scoop the onsen 200 times',
+      'ach.pet.name': 'Slime Best Friend', 'ach.pet.desc': 'Pet slimes 50 times',
+      'ach.namer.name': 'Name Giver', 'ach.namer.desc': 'Name 3 slimes',
+      'ach.ducks.name': 'Big Duck Family', 'ach.ducks.desc': 'Own 5 rubber ducks',
+      'ach.rare10.name': 'Rare Regulars', 'ach.rare10.desc': 'Catch rare slimes 10 times',
+      'ach.clicker2.name': 'Scooping Master', 'ach.clicker2.desc': 'Scoop the onsen 2,000 times',
+      'ach.snack10.name': 'Famous Dango Shop', 'ach.snack10.desc': 'Upgrade the snack bar to Lv.10',
+      'ach.chair5.name': 'Ultimate Relaxation', 'ach.chair5.desc': 'Upgrade the massage chair to Lv.5',
+      'ach.fashion.name': 'Fashionable Wardrobe', 'ach.fashion.desc': 'Collect 10 hats or towels',
+      'ach.daily7.name': 'Weekly Regular', 'ach.daily7.desc': 'Log in 7 days in a row',
+      'ach.poolLv.name': 'Pool Builder', 'ach.poolLv.desc': 'Reach a combined pool level of 30',
+      'ach.earn1m.name': 'Millionaire', 'ach.earn1m.desc': 'Earn 1M onsen coins in total',
+      'ach.tycoon.name': 'Onsen Tycoon', 'ach.tycoon.desc': 'Unlock every pool',
+      'ach.dex.name': 'Rare Slime Collector', 'ach.dex.desc': 'Discover every regular rare slime (seasonal ones excluded)',
+      'ach.rare50.name': 'Rare Slime Hunter', 'ach.rare50.desc': 'Catch rare slimes 50 times',
+      'ach.fest1.name': 'First Festival', 'ach.fest1.desc': 'Hold 1 Onsen Festival',
+      'ach.earn1b.name': 'Onsen Billionaire', 'ach.earn1b.desc': 'Earn 1B onsen coins in total',
+      'ach.fest5.name': 'Festival Pro', 'ach.fest5.desc': 'Hold 5 Onsen Festivals',
+      'say.duck': 'Wow~ a duckie! 🐤', 'say.snackOpen': 'The snack bar is open! 🍡', 'say.snack': 'Dango is yummy~ 🍡',
+      'say.chair': 'Massage chair… brrrrr~ 💺',
+      'say.join': 'I\'m {name}, I\'m joining the bath!', 'say.iam': 'I\'m {name}!', 'say.love': '{name} loves the boss♡',
+      'daily.title': 'Daily Login Bonus', 'daily.claimed': 'Already claimed today!',
+      'daily.streak': 'Login streak: day <b>{n}</b>', 'daily.gift': ' — the slimes have a gift for you~', 'daily.tomorrow': ' — see you tomorrow♪',
+      'daily.day': 'Day {n}', 'daily.claim': 'Claim!', 'daily.later': 'Later', 'daily.ok': 'OK',
+      'daily.note': 'Miss a day and the streak restarts from day 1',
+      'daily.toast': '🎁 Day {n} bonus claimed!', 'daily.say': 'The boss is here again today! ♡',
+      'reward.coins': '💰 {n} onsen coins', 'reward.rainbow': '🌈 {n} rainbow coins',
+      'off.title': 'Welcome back!', 'off.away': 'You were away for {t}', 'off.cap': ' (up to 8 hours count)',
+      'off.earned': 'The slimes kept the shop running and earned:', 'off.ok': 'Collect!',
+      'time.hm': '{h}h {m}m', 'time.ms': '{m}m {s}s', 'time.s': '{s}s',
+      'rare.appear': '✨ {name} appeared! Tap it quick!', 'rare.bye': 'Bye-bye~', 'rare.thanks': 'Thanks for having me♡',
+      'rare.new': '📖 New discovery: {name}!', 'rare.again': '{name} (×{n})',
+      'dex.title': '📖 Rare Slime Book', 'dex.count': 'Found {a} / {b}',
+      'dex.seen': 'Met {n} times', 'dex.active': 'Around now! Look out', 'dex.when': 'Appears in {when}',
+      'dex.unknown': 'Not found yet', 'dex.limited': 'Seasonal',
+      'footer': 'Progress is saved automatically in your browser · Settings are under ⚙️ at the top right',
+      'tut.next': 'Next', 'tut.skip': 'Skip', 'tut.start': 'Let\'s go!',
+      'tut.welcomeTitle': 'Welcome to Slime Onsen Resort!',
+      'tut.welcome': 'Starting today, you run this onsen♨<br>Let\'s take a quick 30-second tour~',
+      'tut.poolTitle': '💧 Tap the onsen',
+      'tut.pool': 'Tap the water to scoop onsen coins! Pet the slimes — they love it. If a sparkly rare slime shows up, tap it fast!',
+      'tut.statsTitle': '📊 Your income',
+      'tut.stats': 'Here are your onsen coins and your income per second and per scoop. 🌈 Rainbow coins buy massage chairs and cute outfits.',
+      'tut.shopTitle': '🛠 Upgrade your resort',
+      'tut.shop': 'Spend coins to expand pools and buy ducks, and you\'ll earn more and more. Upgrades you can afford light up!',
+      'tut.tabsTitle': '🌸 More onsen pools',
+      'tut.tabs': 'Save up to unlock new pools — new slimes will move in too!',
+      'tut.houseTitle': '🏠 Slime House',
+      'tut.house': 'Name your slimes and dress them up in cute hats and towels!',
+      'tut.topTitle': '🎁 Top-right buttons',
+      'tut.top': '🎁 Daily bonus, ⚙️ settings (language, volume, saves), ♪ music.<br>The slimes keep the shop running even while you\'re away!',
+      'pool.forest.name': 'Forest Open-Air Bath', 'pool.sakura.name': 'Sakura Onsen', 'pool.aurora.name': 'Aurora Ice Pool',
+      'pool.forest.lines': ['The forest air is so fresh~', 'I can hear birds singing♪'],
+      'pool.sakura.lines': ['Petals fell in the water~🌸', 'Flower viewing in the bath♡', 'All this pink is so soothing'],
+      'pool.aurora.lines': ['Wow… the aurora is beautiful…✨', 'Freezing outside, warm inside!', 'My head is getting frosty❄️'],
+      'lines': [
+        'Ahh~ so nice~', 'I\'m melting…', 'Just the right temperature♪', 'Blub blub~',
+        'Good work today', 'I want some milk! 🥛', 'I\'m all squishy now', 'Puff puff~',
+        'Five more minutes…', 'So sleepy zzZ', 'Is this heaven?', 'My skin is so bouncy!',
+        'Wanna soak together?', '♨ Pure bliss ♨',
+      ],
+      'petLines': [
+        'Hehe, that tickles~', 'Pet me again♡', 'Squish squish!', 'I love you, boss!',
+        'You found me~', 'Whoa! You startled me', 'Squishy, right?', 'Wanna soak together?♡',
+      ],
+      'names.forest': ['Minty', 'Peachy', 'Bluey', 'Pudding', 'Grape', 'Orange'],
+      'names.sakura': ['Sakura', 'Momo', 'Berry', 'Butter', 'Wisteria', 'Almond'],
+      'names.aurora': ['Icy', 'Snowball', 'Twinkle', 'Lavvy', 'Mint', 'Cloudy'],
+      'hat.none': 'None', 'hat.ribbon': 'Ribbon', 'hat.flower': 'Flower', 'hat.cap': 'Cap',
+      'hat.strawberry': 'Berry', 'hat.strawhat': 'Straw hat', 'hat.grad': 'Grad cap', 'hat.crown': 'Crown',
+      'towel.default': 'Classic', 'towel.none': 'None', 'towel.pink': 'Pink', 'towel.mint': 'Mint',
+      'towel.sky': 'Sky', 'towel.lavender': 'Lavender', 'towel.lemon': 'Lemon', 'towel.stripe': 'Stripes',
+      'rare.gold.name': 'Gold Slime', 'rare.gold.hello': 'Catch me and get rich!',
+      'rare.rainbow.name': 'Rainbow Slime', 'rare.rainbow.hello': 'Seven-colored bubbles~',
+      'rare.sakura.name': 'Sakura Slime', 'rare.sakura.hello': 'Spring is here for a soak♪',
+      'rare.king.name': 'King Slime', 'rare.king.hello': 'The King has arrived!',
+      'rare.dango.name': 'Dango Slime', 'rare.dango.hello': 'Tri-color dango, here for a soak~',
+      'rare.watermelon.name': 'Watermelon Slime', 'rare.watermelon.hello': 'Summer means watermelon!',
+      'rare.maple.name': 'Maple Slime', 'rare.maple.hello': 'The autumn leaves are so pretty~',
+      'rare.snowman.name': 'Snowman Slime', 'rare.snowman.hello': 'I won\'t melt in here… right?',
+      'rare.santa.name': 'Santa Hat Slime', 'rare.santa.hello': 'Merry Christmas! 🎄',
+      'rarity.spring': 'Spring only', 'rarity.summer': 'Summer only', 'rarity.autumn': 'Autumn only',
+      'rarity.winter': 'Winter only', 'rarity.xmas': 'Christmas only',
+      'season.spring.label': '🌸 Spring event: Dango Slimes are around!', 'season.spring.when': 'spring (Mar–May)',
+      'season.summer.label': '🎐 Summer event: Watermelon Slimes are around!', 'season.summer.when': 'summer (Jun–Aug)',
+      'season.autumn.label': '🍁 Autumn event: Maple Slimes are around!', 'season.autumn.when': 'autumn (Sep–Nov)',
+      'season.winter.label': '⛄ Winter event: Snowman Slimes are around!', 'season.winter.when': 'winter (Dec–Feb)',
+      'season.xmas.label': '🎄 Christmas event: Santa Hat Slimes are around!', 'season.xmas.when': 'Christmas (Dec 1–25)',
+    },
+
+    ja: {
+      'title': 'スライム温泉リゾート',
+      'h1': '♨ スライム<span>温泉</span>リゾート ♨',
+      'btn.gift': 'ログインボーナス', 'btn.settings': '設定', 'btn.music': 'BGMのオン・オフ',
+      'music.tapToStart': 'タップで音楽スタート', 'music.missing': 'bgm.mp3 が見つかりません',
+      'music.pause': '音楽を一時停止', 'music.play': '音楽を再生',
+      'set.title': '⚙️ 設定', 'set.langSub': 'ゲームの言語を変更',
+      'set.music': '🎵 BGM', 'set.musicSub': '左端までスライドでミュート',
+      'set.sfx': '🔔 効果音', 'set.sfxSub': 'タップや購入時の「ポン」「チーン」', 'set.mute': 'タップでミュート／解除',
+      'set.save': '💾 セーブコード', 'set.saveSub': '機種変更やデータ削除の前にバックアップ',
+      'set.export': '書き出し', 'set.import': '読み込み', 'set.copy': 'コピー',
+      'set.tutorial': '📘 チュートリアル', 'set.tutorialSub': '遊び方をもう一度見る', 'set.tutorialBtn': '見る',
+      'set.reset': '🧹 データをリセット', 'set.resetSub': 'すべての進行状況を消して最初から',
+      'set.resetBtn': 'リセット', 'set.resetConfirm': '本当にリセット？',
+      'about.name': '♨ スライム温泉リゾート ♨', 'about.line': '<b>あなた</b>だけの癒しの温泉リゾート',
+      'about.ver': 'バージョン {v} · 開業日 {d}',
+      'about.credit': '🎵 BGM：「Japanese Calm Piano」<br>作曲：pianocafe_kumi · 出典：Pixabay',
+      'close': '閉じる',
+      'save.exportMsg': 'このコードをコピーして、メモ帳などに保存してね。',
+      'save.importMsg': 'コードを貼り付けて「読み込み」を押してね。今の進行状況は上書きされます。',
+      'save.copied': '✅ コピーしました！',
+      'save.invalid': '❌ 無効なセーブコードです。全部貼り付けたか確認してね。',
+      'save.confirmBtn': '読み込む',
+      'save.preview': '内容：💰{c}・🌈{r}。もう一度押すと今の進行状況を上書きします。',
+      'save.done': '💾 読み込み完了！おかえりなさい〜',
+      'reset.done': '🌱 リゾートが再オープン！',
+      'dress.aria': 'スライムのお着替え', 'dress.name': '名前', 'dress.placeholder': '名前をつけてね',
+      'dress.hats': '🎩 帽子', 'dress.towels': '🧺 タオル', 'dress.done': '完了',
+      'dress.short': '虹コインが足りないよ〜 あと 🌈{n}',
+      'dress.bought': '「{name}」をゲット！みんな着られるよ',
+      'dress.happy': '{name}はとっても嬉しそう♡',
+      'house.title': '🏠 スライムの家', 'house.guests': '{icon} {pool}のお客さん',
+      'house.tip': 'スライムをタップして名前をつけたり、🌈 虹コインでお着替えできるよ！', 'house.edit': '✏️ 名前・着替え',
+      'stat.coins': '温泉コイン', 'stat.cps': '毎秒', 'stat.cpc': '1回のすくい', 'stat.rainbow': '🌈 虹コイン（{n}/秒）',
+      'pool.hint': 'お湯をタップしてコインをすくおう ✦',
+      'shop.title': '🛠 リゾート強化',
+      'upg.pool': '{pool}を拡張',
+      'upg.poolDesc': '1レベルごとに +{ps}/秒・すくい +{pc}、3レベルごとに新しいスライムが来るよ',
+      'upg.locked': '先にこの温泉を解放してね',
+      'upg.duck': 'アヒルちゃんを買う', 'upg.duckDesc': 'スライムたち大喜び！全収入 +25%（重ねがけ可）',
+      'upg.snack': 'スライムおやつ処', 'upg.snackDesc': '湯上がりにお団子！1レベルごとに虹コイン +0.1/秒',
+      'upg.chair': '極上マッサージチェア', 'upg.chairDesc': 'リラックスして力いっぱい！1レベルごとにすくい量 +100%',
+      'tab.info': '+{ps}/秒 · Lv.{lv}',
+      'unlock.btn': '解放 💰 {n}',
+      'unlock.desc': '解放すると毎秒 +{ps} コイン、すくい +{pc}、新しいスライムもやって来るよ！',
+      'unlock.toast': '🎉 {pool}オープン！', 'unlock.say': '新しい温泉だ！いっくよ〜',
+      'fest.title': '🏮 温泉まつり', 'fest.btn': 'まつりを開催',
+      'fest.owned': '祭り提灯 <b>{n}</b> 個 · 全収入 <b>+{p}%</b>',
+      'fest.earned': '今回の稼ぎ 💰{e} · 開催すると提灯 <b>{g}</b> 個',
+      'fest.next': 'あと 💰{n} 稼ぐと提灯 +1',
+      'fest.badge': '🏮 祭り提灯 ×{n}・全収入 +{p}%',
+      'fest.confirmTitle': '温泉まつりを開催する？',
+      'fest.confirmText': 'スライムたちが天灯を上げてお祝い！リゾートは最初からになるけど、<br>ずっと続くボーナスがもらえるよ！',
+      'fest.gain': '🏮 祭り提灯 +{n} 個',
+      'fest.incomeChange': '全収入：+{a}% → <b>+{b}%</b>',
+      'fest.resets': '🔄 <b>リセット：</b>温泉コイン、虹コイン、温泉（レベル・解放）、アヒル、おやつ処、マッサージチェア',
+      'fest.keeps': '💖 <b>引き継ぎ：</b>祭り提灯、図鑑、実績、スライムの名前と衣装、ログインボーナス',
+      'fest.go': '開催する！', 'fest.cancel': 'やっぱりやめる',
+      'fest.toast': '🎆 第{n}回温泉まつり大成功！収入 +{p}%',
+      'ach.title': '🏆 実績', 'ach.count': '達成 {a} / {b}',
+      'ach.claim': '受け取る', 'ach.claimed': '✓ 受取済み',
+      'ach.reward': '🌈{r} ＋ 💰{m}分の稼ぎ',
+      'ach.toast': '🏆 実績「{name}」達成！', 'ach.claimToast': '🎉 💰{c} ＋ 🌈{r} ゲット', 'ach.say': 'オーナーすごい！✨',
+      'ach.clicker.name': '働き者のすくい名人', 'ach.clicker.desc': '温泉を200回すくう',
+      'ach.pet.name': 'スライムの親友', 'ach.pet.desc': 'スライムを50回なでる',
+      'ach.namer.name': '名付け親', 'ach.namer.desc': 'スライム3匹に名前をつける',
+      'ach.ducks.name': 'アヒル大家族', 'ach.ducks.desc': 'アヒルちゃんを5羽持つ',
+      'ach.rare10.name': 'レアなお客さんの常連', 'ach.rare10.desc': 'レアスライムを10回捕まえる',
+      'ach.clicker2.name': 'すくいの達人', 'ach.clicker2.desc': '温泉を2,000回すくう',
+      'ach.snack10.name': 'お団子の名店', 'ach.snack10.desc': 'おやつ処を Lv.10 にする',
+      'ach.chair5.name': '極上のくつろぎ', 'ach.chair5.desc': 'マッサージチェアを Lv.5 にする',
+      'ach.fashion.name': 'おしゃれクローゼット', 'ach.fashion.desc': '帽子・タオルを10個集める',
+      'ach.daily7.name': '一週間の常連さん', 'ach.daily7.desc': '7日連続でログイン',
+      'ach.poolLv.name': '温泉増築王', 'ach.poolLv.desc': '温泉のレベル合計 30',
+      'ach.earn1m.name': '百万長者', 'ach.earn1m.desc': '温泉コインを累計100万稼ぐ',
+      'ach.tycoon.name': '温泉リゾート王', 'ach.tycoon.desc': 'すべての温泉を解放',
+      'ach.dex.name': 'レアスライムコレクター', 'ach.dex.desc': '常設のレアスライムを全部発見（季節限定は除く）',
+      'ach.rare50.name': 'レアスライムハンター', 'ach.rare50.desc': 'レアスライムを50回捕まえる',
+      'ach.fest1.name': 'はじめての温泉まつり', 'ach.fest1.desc': '温泉まつりを1回開催',
+      'ach.earn1b.name': '温泉億万長者', 'ach.earn1b.desc': '温泉コインを累計10億稼ぐ',
+      'ach.fest5.name': 'まつり名人', 'ach.fest5.desc': '温泉まつりを5回開催',
+      'say.duck': 'わぁ〜アヒルちゃん！🐤', 'say.snackOpen': 'おやつ処オープン！🍡', 'say.snack': 'お団子おいし〜🍡',
+      'say.chair': 'マッサージチェア…ぶるるるる〜💺',
+      'say.join': '{name}だよ、わたしもお湯に入るね！', 'say.iam': '{name}だよ！', 'say.love': '{name}はオーナーが大好き♡',
+      'daily.title': 'ログインボーナス', 'daily.claimed': '今日はもう受け取ったよ！',
+      'daily.streak': '連続ログイン <b>{n}</b> 日目', 'daily.gift': '、スライムたちからプレゼント〜', 'daily.tomorrow': '、また明日来てね♪',
+      'daily.day': '{n}日目', 'daily.claim': '受け取る！', 'daily.later': 'あとで', 'daily.ok': 'OK',
+      'daily.note': '1日でも休むと1日目からやり直しだよ',
+      'daily.toast': '🎁 {n}日目のボーナスをゲット！', 'daily.say': 'オーナー今日も来てくれた！♡',
+      'reward.coins': '💰 {n} 温泉コイン', 'reward.rainbow': '🌈 {n} 虹コイン',
+      'off.title': 'おかえりなさい！', 'off.away': '{t}留守にしていたよ', 'off.cap': '（最大8時間まで）',
+      'off.earned': 'スライムたちがお店番をして稼いだよ：', 'off.ok': '受け取る！',
+      'time.hm': '{h}時間{m}分', 'time.ms': '{m}分{s}秒', 'time.s': '{s}秒',
+      'rare.appear': '✨ {name}が現れた！早くタップ！', 'rare.bye': 'バイバイ〜', 'rare.thanks': 'ありがとうございました♡',
+      'rare.new': '📖 新発見：{name}！', 'rare.again': '{name}（{n}回目）',
+      'dex.title': '📖 レアスライム図鑑', 'dex.count': '発見 {a} / {b}',
+      'dex.seen': '{n}回出会った', 'dex.active': '出没中！探してみて', 'dex.when': '{when}に出現',
+      'dex.unknown': '未発見', 'dex.limited': '季節限定',
+      'footer': '進行状況はブラウザに自動保存されます · 設定は右上の ⚙️ から',
+      'tut.next': '次へ', 'tut.skip': 'スキップ', 'tut.start': 'はじめる！',
+      'tut.welcomeTitle': 'スライム温泉リゾートへようこそ！',
+      'tut.welcome': '今日からあなたがこの温泉のオーナー♨<br>30秒だけ案内させてね〜',
+      'tut.poolTitle': '💧 温泉をタップ',
+      'tut.pool': 'お湯をタップすると温泉コインがすくえるよ！スライムをなでると喜ぶよ。キラキラのレアスライムが来たら、すぐタップしてね！',
+      'tut.statsTitle': '📊 収入',
+      'tut.stats': '温泉コイン、毎秒の収入、1回のすくい量がここに出るよ。🌈 虹コインはマッサージチェアやかわいい服に使えるよ。',
+      'tut.shopTitle': '🛠 リゾートを強化',
+      'tut.shop': 'コインで温泉を拡張したりアヒルを買うと、どんどん稼げるよ。買えるものは明るく表示されるよ！',
+      'tut.tabsTitle': '🌸 新しい温泉',
+      'tut.tabs': 'コインを貯めると新しい温泉を解放できて、新しいスライムもやって来るよ！',
+      'tut.houseTitle': '🏠 スライムの家',
+      'tut.house': 'スライムに名前をつけて、かわいい帽子やタオルを着せてあげよう！',
+      'tut.topTitle': '🎁 右上のボタン',
+      'tut.top': '🎁 毎日のボーナス、⚙️ 設定（言語・音量・セーブ）、♪ BGM。<br>ゲームを閉じても、スライムたちがお店番してくれるよ！',
+      'pool.forest.name': '森の露天風呂', 'pool.sakura.name': '桜の湯', 'pool.aurora.name': 'オーロラ氷の湯',
+      'pool.forest.lines': ['森の空気がおいしい〜', '小鳥が歌ってる♪'],
+      'pool.sakura.lines': ['花びらがお湯に落ちた〜🌸', 'お花見しながらお風呂♡', 'ピンク色で癒される〜'],
+      'pool.aurora.lines': ['わぁ…オーロラきれい…✨', '外は寒いけどお湯はあったか！', '頭に霜がついた❄️'],
+      'lines': [
+        'ふぅ〜気持ちいい〜', 'とろけちゃう…', 'ちょうどいい湯加減♪', 'ぷくぷく〜',
+        '今日もおつかれさま', '牛乳飲みたい！🥛', 'ふにゃふにゃになった', 'ぷにぷに〜',
+        'あと5分だけ…', '眠くなってきた zzZ', 'ここは天国かな', 'お肌ぷるぷる！',
+        'いっしょに入る？', '♨ 極楽極楽 ♨',
+      ],
+      'petLines': [
+        'えへへ、くすぐったい〜', 'もっとなでて♡', 'ぷにぷに！', 'オーナー大好き！',
+        '見つかっちゃった〜', 'わっ！びっくりした', 'ふわふわでしょ？', 'いっしょに入ろ？♡',
+      ],
+      'names.forest': ['みどり', 'もも', 'あお', 'プリン', 'ぶどう', 'みかん'],
+      'names.sakura': ['さくら', 'こもも', 'いちご', 'バター', 'ふじ', 'アーモンド'],
+      'names.aurora': ['こおり', 'ゆきだま', 'ほし', 'ラベンダー', 'ミント', 'くも'],
+      'hat.none': 'なし', 'hat.ribbon': 'リボン', 'hat.flower': 'お花', 'hat.cap': 'キャップ',
+      'hat.strawberry': 'いちご', 'hat.strawhat': '麦わら', 'hat.grad': '角帽', 'hat.crown': '王冠',
+      'towel.default': 'いつもの', 'towel.none': 'なし', 'towel.pink': 'ピンク', 'towel.mint': 'ミント',
+      'towel.sky': '空色', 'towel.lavender': 'ラベンダー', 'towel.lemon': 'レモン', 'towel.stripe': 'しましま',
+      'rare.gold.name': '金貨スライム', 'rare.gold.hello': '捕まえたらお金持ちになれるよ！',
+      'rare.rainbow.name': '虹スライム', 'rare.rainbow.hello': '七色のあわあわ〜',
+      'rare.sakura.name': '桜スライム', 'rare.sakura.hello': '春がお風呂に来たよ♪',
+      'rare.king.name': 'キングスライム', 'rare.king.hello': '王様のおなーりー！',
+      'rare.dango.name': '団子スライム', 'rare.dango.hello': '三色団子がお風呂に来たよ〜',
+      'rare.watermelon.name': 'スイカスライム', 'rare.watermelon.hello': '夏といえばスイカ！',
+      'rare.maple.name': 'もみじスライム', 'rare.maple.hello': '秋のもみじはきれいだね〜',
+      'rare.snowman.name': '雪だるまスライム', 'rare.snowman.hello': 'お風呂で溶けないよね…？',
+      'rare.santa.name': 'サンタ帽スライム', 'rare.santa.hello': 'メリークリスマス！🎄',
+      'rarity.spring': '春限定', 'rarity.summer': '夏限定', 'rarity.autumn': '秋限定',
+      'rarity.winter': '冬限定', 'rarity.xmas': 'クリスマス限定',
+      'season.spring.label': '🌸 春限定：団子スライム出没中！', 'season.spring.when': '春（3〜5月）',
+      'season.summer.label': '🎐 夏限定：スイカスライム出没中！', 'season.summer.when': '夏（6〜8月）',
+      'season.autumn.label': '🍁 秋限定：もみじスライム出没中！', 'season.autumn.when': '秋（9〜11月）',
+      'season.winter.label': '⛄ 冬限定：雪だるまスライム出没中！', 'season.winter.when': '冬（12〜2月）',
+      'season.xmas.label': '🎄 クリスマス限定：サンタ帽スライム出没中！', 'season.xmas.when': 'クリスマス（12/1〜12/25）',
+    },
+  };
+  const LANGS = [['zh', '中文'], ['en', 'English'], ['ja', '日本語']];
+  const HTML_LANG = { zh: 'zh-Hant', en: 'en', ja: 'ja' };
+  const DATE_LOCALE = { zh: 'zh-TW', en: 'en-US', ja: 'ja-JP' };
+  const LANG_KEY = 'slimeOnsenLang';
+  // 第一次玩：依瀏覽器語言決定（日文 → 日本語、中文 → 中文、其他 → English）
+  function detectLang() {
+    try { const v = localStorage.getItem(LANG_KEY); if (I18N[v]) return v; } catch (e) {}
+    const nav = (navigator.language || '').toLowerCase();
+    return nav.startsWith('ja') ? 'ja' : nav.startsWith('zh') ? 'zh' : 'en';
+  }
+  let lang = detectLang();
+  function t(key, params) {
+    let s = I18N[lang][key];
+    if (s === undefined) s = I18N.zh[key];
+    if (s === undefined) return key;
+    if (!params || typeof s !== 'string') return s;
+    return s.replace(/\{(\w+)\}/g, (m, k) => params[k] !== undefined ? params[k] : m);
+  }
 
   // ===== 溫泉池設定 =====
   // 數值平衡：解鎖價格 ≈ 基礎產出 × 250~500 秒，擴建每 +1/秒 的起始價格約 15~120 幣，
   // 所以舊池擴建變貴時，解鎖新池就是更划算的選擇。
   const POOLS = [
-    { id: 'forest', name: '森林露天風呂', icon: '🌲', unlock: 0,
+    { id: 'forest', icon: '🌲', unlock: 0,
       base: 1,   perLv: 1,   clickBase: 1,  clickPerLv: 0.5, lvCost: 15,
       colors: ['#a8e6b8', '#f7b7c3', '#b8d4f7', '#f9dc8c', '#d4bdf5', '#ffc9a3'],
-      towel: '#fff', lines: ['森林的空氣好清新～', '聽到小鳥在唱歌♪'] },
-    { id: 'sakura', name: '櫻花溫泉', icon: '🌸', unlock: 5000,
+      towel: '#fff' },
+    { id: 'sakura', icon: '🌸', unlock: 5000,
       base: 20,  perLv: 8,   clickBase: 5,  clickPerLv: 4,   lvCost: 800,
       colors: ['#ffc4d4', '#ffe0e9', '#f5b0c8', '#fff0c9', '#e8c8f0', '#ffd7c2'],
-      towel: '#ffd6e0', lines: ['花瓣掉進湯裡了～🌸', '邊賞花邊泡湯♡', '粉紅色的好療癒'] },
-    { id: 'aurora', name: '極光冰晶池', icon: '❄️', unlock: 150000,
+      towel: '#ffd6e0' },
+    { id: 'aurora', icon: '❄️', unlock: 150000,
       base: 300, perLv: 100, clickBase: 60, clickPerLv: 50,  lvCost: 12000,
       colors: ['#c8ecff', '#e3f6ff', '#b9d3ff', '#d9ccff', '#bff5ea', '#f0f4ff'],
-      towel: '#dff3ff', lines: ['哇…極光好美…✨', '外面好冷，湯好暖！', '頭頂結霜了❄️'] },
+      towel: '#dff3ff' },
   ];
+  // 把資料表裡的名稱等文字改成「依目前語言讀取」的屬性，例如 POOLS[0].name
+  function localize(list, props) {
+    for (const o of list) for (const [prop, key] of Object.entries(props)) {
+      Object.defineProperty(o, prop, { get: () => t(key(o)), enumerable: true });
+    }
+  }
+  localize(POOLS, { name: p => `pool.${p.id}.name`, lines: p => `pool.${p.id}.lines` });
   const poolDef = id => POOLS.find(p => p.id === id);
 
   // ===== 遊戲狀態 =====
@@ -1050,12 +1604,13 @@
     activePool: 'forest',
     dex: {},               // 稀有史萊姆 id → 捕獲次數
     daily: { last: null, streak: 0 },   // 上次領取每日獎勵的日期（YYYY-MM-DD）與連續天數
-    stats: { clicks: 0 },               // 累計撈取次數（成就用）
+    stats: { clicks: 0, pets: 0, totalEarned: 0 },   // 成就用：撈取次數、摸摸次數、累計賺得溫泉幣（溫泉祭不重置）
     ach: {},                            // 成就 id → 'done'（可領取）或 'claimed'（已領取）
     lanterns: 0, festivals: 0,          // 溫泉祭：祭典燈籠數量、舉辦次數（轉生後保留）
     runEarned: 0,                       // 這一輪（上次溫泉祭之後）累計賺到的溫泉幣
-    looks: {},                          // 史萊姆外觀：'池id-編號' → { name, hat, towel }
+    looks: {},                          // 史萊姆外觀：'池id-編號' → { name?, hat, towel }（name 只存玩家自己取的名字）
     wardrobe: { hats: [], towels: [] }, // 已購買的帽子 / 毛巾
+    tutorial: false,                    // 是否看完新手教學
     startedAt: Date.now(),
     lastSeen: Date.now(),
   });
@@ -1065,6 +1620,7 @@
   function earn(n) {
     state.coins += n;
     state.runEarned += n;
+    state.stats.totalEarned += n;
   }
 
   const active = () => poolDef(state.activePool);
@@ -1103,6 +1659,13 @@
     s.looks = s.looks || {};
     s.wardrobe = { hats: [], towels: [], ...data.wardrobe };
     if (data.runEarned == null) s.runEarned = s.coins || 0;          // 舊存檔：以目前金幣當作本輪收入
+    if (!data.stats || data.stats.totalEarned == null) s.stats.totalEarned = s.runEarned;  // 舊存檔：至少有本輪收入
+    if (data.tutorial == null) s.tutorial = true;                    // 舊玩家不用再看新手教學
+    // 舊版會把預設名字（例如「小綠」）也存進去；拿掉後切換語言時才會顯示該語言的預設名字
+    for (const [key, look] of Object.entries(s.looks)) {
+      const [pid, idx] = key.split('-');
+      if (look && look.name === (I18N.zh['names.' + pid] || [])[idx]) delete look.name;
+    }
     if (!data.startedAt) s.startedAt = data.lastSeen || Date.now();
     s.pools = base.pools;
     for (const p of POOLS) Object.assign(s.pools[p.id], (data.pools || {})[p.id]);
@@ -1129,9 +1692,9 @@
   }
   function fmtTime(sec) {
     const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = Math.floor(sec % 60);
-    if (h) return `${h} 小時 ${m} 分`;
-    if (m) return `${m} 分 ${s} 秒`;
-    return `${s} 秒`;
+    if (h) return t('time.hm', { h, m });
+    if (m) return t('time.ms', { m, s });
+    return t('time.s', { s });
   }
 
   // ===== DOM =====
@@ -1144,10 +1707,10 @@
     $('cpc').textContent = fmt(perClick());
     const def = active(), data = activeData();
     $('pool-icon').textContent = def.icon;
-    $('pool-upg-name').textContent = `擴建${def.name}`;
+    $('pool-upg-name').textContent = t('upg.pool', { pool: def.name });
     $('pool-upg-desc').textContent = data.unlocked
-      ? `每級 +${fmt(def.perLv * multiplier())}/秒、撈取 +${fmt(def.clickPerLv)}；每 3 級有新史萊姆入住`
-      : '需要先解鎖這座溫泉池';
+      ? t('upg.poolDesc', { ps: fmt(def.perLv * multiplier()), pc: fmt(def.clickPerLv) })
+      : t('upg.locked');
     $('cost-pool').textContent = fmt(cost.pool());
     $('cost-duck').textContent = fmt(cost.duck());
     $('lv-pool').textContent = data.lv;
@@ -1157,18 +1720,18 @@
     for (const p of POOLS) {
       const d = state.pools[p.id];
       $('tabinfo-' + p.id).textContent = d.unlocked
-        ? `+${fmt(poolPerSecond(p))}/秒 · Lv.${d.lv}`
+        ? t('tab.info', { ps: fmt(poolPerSecond(p)), lv: d.lv })
         : `🔒 💰 ${fmt(p.unlock)}`;
       $('tab-' + p.id).classList.toggle('locked', !d.unlocked);
     }
     if (!data.unlocked) {
-      $('unlock-btn').textContent = `解鎖 💰 ${fmt(def.unlock)}`;
+      $('unlock-btn').textContent = t('unlock.btn', { n: fmt(def.unlock) });
       $('unlock-btn').disabled = state.coins < def.unlock;
     }
     $('buy-duck').disabled = state.coins < cost.duck();
 
     $('rainbow').textContent = fmt(state.rainbow);
-    $('rps').textContent = fmt(rainbowPerSecond());
+    $('rainbow-label').textContent = t('stat.rainbow', { n: fmt(rainbowPerSecond()) });
     $('cost-snack').textContent = fmt(cost.snack());
     $('cost-chair').textContent = fmt(cost.chair());
     $('lv-snack').textContent = state.snackLv;
@@ -1195,13 +1758,11 @@
         ? '<span>🏮</span>'.repeat(Math.min(n, 5)) + (n > 5 ? `<span class="more">×${n}</span>` : '')
         : '<span style="opacity:.35">🏮</span>';
       $('lantern-badge').hidden = !n;
-      $('lantern-badge').textContent = `🏮 祭典燈籠 ×${n}・所有收益 +${n * 10}%`;
+      $('lantern-badge').textContent = t('fest.badge', { n, p: n * 10 });
+      $('fest-line1').innerHTML = t('fest.owned', { n, p: n * 10 });
     }
-    $('fest-owned').textContent = state.lanterns;
-    $('fest-bonus').textContent = `+${state.lanterns * 10}%`;
-    $('fest-earned').textContent = fmt(state.runEarned);
-    $('fest-gain').textContent = gain;
-    $('fest-next').textContent = `再賺 💰${fmt((gain + 1) ** 2 * FEST_UNIT - state.runEarned)} 可以多拿 1 個燈籠`;
+    $('fest-line2').innerHTML = t('fest.earned', { e: fmt(state.runEarned), g: gain });
+    $('fest-next').textContent = t('fest.next', { n: fmt((gain + 1) ** 2 * FEST_UNIT - state.runEarned) });
     $('fest-btn').disabled = gain < 1;
   }
 
@@ -1214,16 +1775,16 @@
     bg.innerHTML = `
       <div class="modal">
         <div class="big">🏮🎆🏮</div>
-        <h3>要舉辦溫泉祭嗎？</h3>
-        <p>史萊姆們會放天燈慶祝，度假村重新開始經營，<br>但你會獲得永久加成！</p>
-        <div class="gain" style="color:#c8553d">🏮 +${gain} 個祭典燈籠</div>
-        <p>所有收益：+${state.lanterns * 10}% → <b>+${(state.lanterns + gain) * 10}%</b></p>
+        <h3>${t('fest.confirmTitle')}</h3>
+        <p>${t('fest.confirmText')}</p>
+        <div class="gain" style="color:#c8553d">${t('fest.gain', { n: gain })}</div>
+        <p>${t('fest.incomeChange', { a: state.lanterns * 10, b: (state.lanterns + gain) * 10 })}</p>
         <p style="font-size:.78rem;opacity:.75;text-align:left;margin-top:10px">
-          🔄 <b>會重置：</b>溫泉幣、彩虹金幣、溫泉池（等級與解鎖）、小鴨、點心吧、按摩椅<br>
-          💖 <b>會保留：</b>祭典燈籠、圖鑑、成就、史萊姆的名字與衣櫃、每日登入
+          ${t('fest.resets')}<br>
+          ${t('fest.keeps')}
         </p>
-        <button data-sfx="own" class="fest-go" style="background:#d9634b;box-shadow:0 4px 0 #a94a36">舉辦溫泉祭！</button>
-        <button class="link-btn fest-cancel">再想想</button>
+        <button data-sfx="own" class="fest-go" style="background:#d9634b;box-shadow:0 4px 0 #a94a36">${t('fest.go')}</button>
+        <button class="link-btn fest-cancel">${t('fest.cancel')}</button>
       </div>`;
     document.body.appendChild(bg);
     bg.querySelector('.fest-cancel').onclick = () => bg.remove();
@@ -1244,7 +1805,7 @@
     refreshAll();
     sfx.sparkle();
     setTimeout(() => sfx.sparkle(), 350);
-    toast(`🎆 第 ${state.festivals} 屆溫泉祭大成功！收益 +${state.lanterns * 10}%`);
+    toast(t('fest.toast', { n: state.festivals, p: state.lanterns * 10 }));
 
     // 天燈升空動畫
     const layer = document.createElement('div');
@@ -1262,9 +1823,22 @@
   }
 
   // ===== 音效（Web Audio API 即時合成，不需要音效檔）=====
-  const SFX_KEY = 'slimeOnsenSfx';
-  let sfxOn = true;
-  try { sfxOn = localStorage.getItem(SFX_KEY) !== 'off'; } catch (e) {}
+  // 音量 0～100，存在 localStorage（不放進存檔碼，換裝置時各自設定）
+  const SFX_KEY = 'slimeOnsenSfx';          // 舊版的音效開關（'off' = 關）
+  const SFX_VOL_KEY = 'slimeOnsenSfxVol';
+  const MUSIC_VOL_KEY = 'slimeOnsenMusicVol';
+  function loadVol(key, def) {
+    try {
+      const v = localStorage.getItem(key);
+      if (v !== null && v !== '' && !isNaN(v)) return Math.max(0, Math.min(100, Number(v)));
+    } catch (e) {}
+    return def;
+  }
+  let sfxVol = loadVol(SFX_VOL_KEY, 80);
+  try { if (localStorage.getItem(SFX_VOL_KEY) === null && localStorage.getItem(SFX_KEY) === 'off') sfxVol = 0; } catch (e) {}
+  let sfxOn = sfxVol > 0;
+  let musicVol = loadVol(MUSIC_VOL_KEY, 50);
+  const bgmVolume = () => musicVol / 100 * 0.7;   // 音量 50 = 原本的 0.35
   let audioCtx = null;
 
   function getCtx() {
@@ -1286,7 +1860,7 @@
     osc.frequency.setValueAtTime(freq, t);
     if (slideTo) osc.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
     gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.linearRampToValueAtTime(vol, t + 0.01);
+    gain.gain.linearRampToValueAtTime(Math.max(0.0002, vol * sfxVol / 80), t + 0.01);   // 音量 80 = 原本的大小
     gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     osc.connect(gain).connect(ctx.destination);
     osc.start(t);
@@ -1380,19 +1954,50 @@
   }
 
   // ===== 成就 =====
+  // 大致依照難度排列；名稱與說明在 I18N 的 ach.<id>.name / ach.<id>.desc
+  const rareCaught = () => Object.values(state.dex).reduce((a, n) => a + n, 0);
   const ACHIEVEMENTS = [
-    { id: 'clicker', icon: '🫧', name: '勤勞的撈金小幫手', desc: '手動撈溫泉 200 次',
+    { id: 'clicker', icon: '🫧',
       progress: () => [state.stats.clicks, 200], reward: { rainbow: 5, coinSec: 120 } },
-    { id: 'ducks', icon: '🐤', name: '小鴨大家族', desc: '擁有 5 隻黃色小鴨',
+    { id: 'pet', icon: '💕',
+      progress: () => [state.stats.pets, 50], reward: { rainbow: 5, coinSec: 120 } },
+    { id: 'namer', icon: '✏️',
+      progress: () => [Object.values(state.looks).filter(l => l && l.name).length, 3], reward: { rainbow: 5, coinSec: 120 } },
+    { id: 'ducks', icon: '🐤',
       progress: () => [state.ducks, 5], reward: { rainbow: 10, coinSec: 300 } },
-    { id: 'dex', icon: '📖', name: '稀有史萊姆收藏家', desc: '發現全部常駐稀有史萊姆（不含季節限定）',
+    { id: 'rare10', icon: '✨',
+      progress: () => [rareCaught(), 10], reward: { rainbow: 10, coinSec: 300 } },
+    { id: 'clicker2', icon: '🌊',
+      progress: () => [state.stats.clicks, 2000], reward: { rainbow: 15, coinSec: 600 } },
+    { id: 'snack10', icon: '🍡',
+      progress: () => [state.snackLv, 10], reward: { rainbow: 10, coinSec: 300 } },
+    { id: 'chair5', icon: '💺',
+      progress: () => [state.chairLv, 5], reward: { rainbow: 15, coinSec: 300 } },
+    { id: 'fashion', icon: '👒',
+      progress: () => [state.wardrobe.hats.length + state.wardrobe.towels.length, 10], reward: { rainbow: 20, coinSec: 600 } },
+    { id: 'daily7', icon: '📅',
+      progress: () => [state.daily.streak, 7], reward: { rainbow: 20, coinSec: 600 } },
+    { id: 'poolLv', icon: '🏗️',
+      progress: () => [POOLS.reduce((a, p) => a + state.pools[p.id].lv, 0), 30], reward: { rainbow: 15, coinSec: 600 } },
+    { id: 'earn1m', icon: '💰',
+      progress: () => [state.stats.totalEarned, 1e6], reward: { rainbow: 20, coinSec: 600 } },
+    { id: 'tycoon', icon: '👑',
+      progress: () => [POOLS.filter(p => state.pools[p.id].unlocked).length, POOLS.length], reward: { rainbow: 50, coinSec: 900 } },
+    { id: 'dex', icon: '📖',
       progress: () => {
         const regular = RARE_TYPES.filter(t => !t.season);   // 季節限定不列入，任何時候都能達成
         return [regular.filter(t => state.dex[t.id]).length, regular.length];
       }, reward: { rainbow: 30, coinSec: 600 } },
-    { id: 'tycoon', icon: '👑', name: '溫泉度假村大亨', desc: '解鎖全部溫泉池',
-      progress: () => [POOLS.filter(p => state.pools[p.id].unlocked).length, POOLS.length], reward: { rainbow: 50, coinSec: 900 } },
+    { id: 'rare50', icon: '🔮',
+      progress: () => [rareCaught(), 50], reward: { rainbow: 30, coinSec: 900 } },
+    { id: 'fest1', icon: '🏮',
+      progress: () => [state.festivals, 1], reward: { rainbow: 20, coinSec: 600 } },
+    { id: 'earn1b', icon: '💎',
+      progress: () => [state.stats.totalEarned, 1e9], reward: { rainbow: 50, coinSec: 1200 } },
+    { id: 'fest5', icon: '🎆',
+      progress: () => [state.festivals, 5], reward: { rainbow: 50, coinSec: 1200 } },
   ];
+  localize(ACHIEVEMENTS, { name: a => `ach.${a.id}.name`, desc: a => `ach.${a.id}.desc` });
   // 溫泉幣獎勵以「幾秒份的產出」計算，玩到後期也一樣有感
   const achCoins = a => Math.round(Math.max(1000, perSecond() * a.reward.coinSec));
 
@@ -1403,7 +2008,7 @@
       if (cur >= target) {
         state.ach[a.id] = 'done';
         sfx.sparkle();
-        toast(`🏆 達成成就「${a.name}」！`);
+        toast(t('ach.toast', { name: a.name }));
         save();
       }
     }
@@ -1411,33 +2016,43 @@
   }
 
   let achSig = '';
+  // 已達成的成就一律顯示滿格（溫泉祭後小鴨等數量歸零也不會倒退）
+  const achProgress = a => {
+    const [cur, target] = a.progress();
+    return [state.ach[a.id] ? target : Math.min(cur, target), target];
+  };
   function renderAch() {
-    // 只有進度或狀態改變時才重畫，避免按鈕在點擊途中被換掉
-    const sig = ACHIEVEMENTS.map(a => (state.ach[a.id] || '') + a.progress().join('/')).join('|');
-    if (sig === achSig) return;
-    achSig = sig;
-    $('ach-list').innerHTML = ACHIEVEMENTS.map(a => {
-      const st = state.ach[a.id];
-      const [cur, target] = a.progress();
-      const pct = Math.min(100, cur / target * 100);
-      const right = st === 'done'
-        ? `<button class="claim" data-sfx="own" data-ach="${a.id}">領取</button>`
-        : st === 'claimed' ? '<span class="stamp-ok">✓ 已領取</span>' : '';
-      return `
-        <div class="ach ${st || ''}">
-          <div class="medal">${a.icon}</div>
-          <div class="info">
-            <div class="aname">${a.name}</div>
-            <div class="adesc">${a.desc}</div>
-            <div class="bar"><i style="width:${pct}%"></i></div>
-            <div class="meta"><span>${fmt(Math.min(cur, target))} / ${fmt(target)}</span>
-              <span>🌈${a.reward.rainbow} ＋ 💰${a.reward.coinSec / 60}分鐘產出</span></div>
-          </div>
-          ${right}
-        </div>`;
-    }).join('');
-    $('ach-done').textContent = ACHIEVEMENTS.filter(a => state.ach[a.id]).length;
-    $('ach-total').textContent = ACHIEVEMENTS.length;
+    // 只有狀態或語言改變時才整個重畫，避免「領取」按鈕在點擊途中被換掉；
+    // 進度條則直接更新數字與長度（累計收入每秒都在變）
+    const sig = lang + '|' + ACHIEVEMENTS.map(a => state.ach[a.id] || '').join('|');
+    if (sig !== achSig) {
+      achSig = sig;
+      $('ach-list').innerHTML = ACHIEVEMENTS.map(a => {
+        const st = state.ach[a.id];
+        const right = st === 'done'
+          ? `<button class="claim" data-sfx="own" data-ach="${a.id}">${t('ach.claim')}</button>`
+          : st === 'claimed' ? `<span class="stamp-ok">${t('ach.claimed')}</span>` : '';
+        return `
+          <div class="ach ${st || ''}">
+            <div class="medal">${a.icon}</div>
+            <div class="info">
+              <div class="aname">${a.name}</div>
+              <div class="adesc">${a.desc}</div>
+              <div class="bar"><i></i></div>
+              <div class="meta"><span class="aprog"></span>
+                <span>${t('ach.reward', { r: a.reward.rainbow, m: a.reward.coinSec / 60 })}</span></div>
+            </div>
+            ${right}
+          </div>`;
+      }).join('');
+      $('ach-count').textContent = t('ach.count', { a: ACHIEVEMENTS.filter(a => state.ach[a.id]).length, b: ACHIEVEMENTS.length });
+    }
+    const cards = $('ach-list').children;
+    ACHIEVEMENTS.forEach((a, i) => {
+      const [cur, target] = achProgress(a);
+      cards[i].querySelector('.bar i').style.width = (cur / target * 100) + '%';
+      cards[i].querySelector('.aprog').textContent = `${fmt(Math.floor(cur))} / ${fmt(target)}`;
+    });
   }
 
   $('ach-list').addEventListener('click', e => {
@@ -1450,9 +2065,9 @@
     state.rainbow += a.reward.rainbow;
     state.ach[a.id] = 'claimed';
     sfx.sparkle();
-    toast(`🎉 領取 💰${fmt(coins)} ＋ 🌈${a.reward.rainbow}`);
+    toast(t('ach.claimToast', { c: fmt(coins), r: a.reward.rainbow }));
     const s = slimes[Math.floor(Math.random() * slimes.length)];
-    if (s) say(s, '老闆好厲害！✨');
+    if (s) say(s, t('ach.say'));
     renderAch(); render(); save();
   });
 
@@ -1471,7 +2086,7 @@
     sfx.ding();
     syncDucks(); render(); save();
     const s = slimes[Math.floor(Math.random() * slimes.length)];
-    if (s) say(s, '哇～小鴨鴨！🐤');
+    if (s) say(s, t('say.duck'));
   });
   $('buy-snack').addEventListener('click', () => {
     const c = cost.snack();
@@ -1480,7 +2095,7 @@
     sfx.ding();
     render(); save();
     const s = slimes[Math.floor(Math.random() * slimes.length)];
-    if (s) say(s, state.snackLv === 1 ? '點心吧開張了！🍡' : '糰子好好吃～🍡');
+    if (s) say(s, t(state.snackLv === 1 ? 'say.snackOpen' : 'say.snack'));
   });
   $('buy-chair').addEventListener('click', () => {
     const c = cost.chair();
@@ -1489,15 +2104,15 @@
     sfx.ding();
     render(); save();
     const s = slimes[Math.floor(Math.random() * slimes.length)];
-    if (s) say(s, '按摩椅…咕嚕嚕嚕嚕～💺');
+    if (s) say(s, t('say.chair'));
   });
 
   // ===== 設定視窗 =====
   const settingsBg = $('settings-bg');
   function openSettings() {
-    $('sfx-switch').setAttribute('aria-checked', sfxOn);
-    $('version').textContent = 'v' + VERSION;
-    $('since').textContent = new Date(state.startedAt).toLocaleDateString('zh-TW');
+    syncVolUI();
+    $('about-ver').textContent = t('about.ver', {
+      v: 'v' + VERSION, d: new Date(state.startedAt).toLocaleDateString(DATE_LOCALE[lang]) });
     settingsBg.hidden = false;
   }
   function closeSettings() {
@@ -1510,24 +2125,59 @@
   settingsBg.addEventListener('click', e => { if (e.target === settingsBg) closeSettings(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !settingsBg.hidden) closeSettings(); });
 
-  $('sfx-switch').addEventListener('click', function () {
-    sfxOn = !sfxOn;
-    try { localStorage.setItem(SFX_KEY, sfxOn ? 'on' : 'off'); } catch (e) {}
-    this.setAttribute('aria-checked', sfxOn);
-    if (sfxOn) sfx.ding();   // 打開時給一聲示範
+  // ----- 音量滑桿 -----
+  const VOL_SLIDERS = {
+    music: { get: () => musicVol, set: v => { musicVol = v; bgm.volume = bgmVolume(); }, key: MUSIC_VOL_KEY, last: 50 },
+    sfx:   { get: () => sfxVol,   set: v => { sfxVol = v; sfxOn = v > 0; },             key: SFX_VOL_KEY,   last: 80 },
+  };
+  function syncVolUI() {
+    for (const [id, c] of Object.entries(VOL_SLIDERS)) {
+      const v = c.get();
+      $(id + '-vol').value = v;
+      $(id + '-vol').style.setProperty('--p', v + '%');   // Chrome / Safari 的已填滿部分
+      $(id + '-vol-val').textContent = v + '%';
+      $(id + '-vol-ico').textContent = v === 0 ? '🔇' : (id === 'music' ? '🎵' : '🔔');
+    }
+  }
+  function setVol(id, v, preview) {
+    const c = VOL_SLIDERS[id];
+    c.set(v);
+    try { localStorage.setItem(c.key, String(v)); } catch (e) {}
+    syncVolUI();
+    if (preview && id === 'sfx') sfx.ding();    // 放開滑桿時給一聲示範
+  }
+  for (const id of Object.keys(VOL_SLIDERS)) {
+    const input = $(id + '-vol');
+    input.addEventListener('input', () => setVol(id, Number(input.value)));
+    input.addEventListener('change', () => setVol(id, Number(input.value), true));
+    // 點喇叭圖示：靜音 ↔ 恢復成靜音前的音量
+    $(id + '-vol-ico').addEventListener('click', () => {
+      const c = VOL_SLIDERS[id], v = c.get();
+      if (v > 0) { c.last = v; setVol(id, 0); }
+      else setVol(id, c.last || 50, true);
+    });
+  }
+
+  // ----- 語言 -----
+  $('lang-btns').addEventListener('click', e => {
+    const b = e.target.closest('[data-lang]');
+    if (b && b.dataset.lang !== lang) setLang(b.dataset.lang);
   });
+
+  // ----- 重看新手教學 -----
+  $('tutorial-btn').addEventListener('click', () => { closeSettings(); startTutorial(); });
 
   // 重置：按兩次才會真的清除，避免誤觸
   let resetTimer = null;
   function disarmReset() {
     clearTimeout(resetTimer);
     $('reset').classList.remove('armed');
-    $('reset').textContent = '重置';
+    $('reset').textContent = t('set.resetBtn');
   }
   $('reset').addEventListener('click', function () {
     if (!this.classList.contains('armed')) {
       this.classList.add('armed');
-      this.textContent = '確定要重置？';
+      this.textContent = t('set.resetConfirm');
       resetTimer = setTimeout(disarmReset, 3000);
       return;
     }
@@ -1536,7 +2186,8 @@
     if (rare) removeRare(rare);
     refreshAll();
     closeSettings();
-    toast('🌱 度假村重新開幕！');
+    toast(t('reset.done'));
+    startTutorial();          // 從頭開始經營，順便再看一次教學
   });
 
   // 整個 state 被換掉後（重置 / 匯入），重畫所有畫面
@@ -1565,8 +2216,8 @@
     $('save-panel').hidden = false;
     $('save-code').readOnly = true;
     $('save-code').value = SAVE_PREFIX + toB64(JSON.stringify(state));
-    $('save-action').textContent = '複製';
-    setSaveMsg('請把這串存檔碼複製起來，貼到記事本或傳給自己保存。');
+    $('save-action').textContent = t('set.copy');
+    setSaveMsg(t('save.exportMsg'));
     $('save-code').select();
   });
 
@@ -1576,8 +2227,8 @@
     $('save-panel').hidden = false;
     $('save-code').readOnly = false;
     $('save-code').value = '';
-    $('save-action').textContent = '匯入';
-    setSaveMsg('貼上存檔碼後按「匯入」，目前的進度會被取代。');
+    $('save-action').textContent = t('set.import');
+    setSaveMsg(t('save.importMsg'));
     $('save-code').focus();
   });
 
@@ -1590,7 +2241,7 @@
         ta.select();
         document.execCommand('copy');
       }
-      setSaveMsg('✅ 已複製到剪貼簿！');
+      setSaveMsg(t('save.copied'));
       return;
     }
 
@@ -1603,14 +2254,14 @@
       if (typeof data.coins !== 'number' || typeof data.pools !== 'object') throw new Error('shape');
     } catch (e) {
       importArmed = false;
-      $('save-action').textContent = '匯入';
-      setSaveMsg('❌ 這不是有效的存檔碼，請確認有完整貼上。', true);
+      $('save-action').textContent = t('set.import');
+      setSaveMsg(t('save.invalid'), true);
       return;
     }
     if (!importArmed) {
       importArmed = true;
-      $('save-action').textContent = '確定匯入';
-      setSaveMsg(`存檔內容：💰${fmt(data.coins)}、🌈${fmt(data.rainbow || 0)}。再按一次確定取代目前進度。`);
+      $('save-action').textContent = t('save.confirmBtn');
+      setSaveMsg(t('save.preview', { c: fmt(data.coins), r: fmt(data.rainbow || 0) }));
       return;
     }
     state = normalize(data);
@@ -1618,10 +2269,10 @@
     refreshAll();
     closeSettings();
     sfx.sparkle();
-    toast('💾 存檔匯入成功！歡迎回來～');
+    toast(t('save.done'));
   });
   $('save-code').addEventListener('input', () => {
-    if (saveMode === 'import' && importArmed) { importArmed = false; $('save-action').textContent = '匯入'; }
+    if (saveMode === 'import' && importArmed) { importArmed = false; $('save-action').textContent = t('set.import'); }
   });
 
   // ===== 每日登入獎勵 =====
@@ -1655,7 +2306,7 @@
     const stamps = DAILY_COIN_MULT.map((_, i) => {
       const n = i + 1;
       const cls = n < day || (n === day && !claimable) ? 'done' : (n === day ? 'today' : '');
-      return `<div class="stamp ${cls}"><i>${n === 7 ? '🎁' : (n % 2 ? '💰' : '🌈')}</i>第${n}天</div>`;
+      return `<div class="stamp ${cls}"><i>${n === 7 ? '🎁' : (n % 2 ? '💰' : '🌈')}</i>${t('daily.day', { n })}</div>`;
     }).join('');
 
     dailyBg = document.createElement('div');
@@ -1663,16 +2314,16 @@
     dailyBg.innerHTML = `
       <div class="modal daily">
         <div class="big">🎁</div>
-        <h3>${claimable ? '每日登入獎勵' : '今天已經領過囉！'}</h3>
-        <p>連續登入第 <b>${streak}</b> 天${claimable ? '，史萊姆們準備了禮物～' : '，明天再來喔♪'}</p>
+        <h3>${t(claimable ? 'daily.title' : 'daily.claimed')}</h3>
+        <p>${t('daily.streak', { n: streak })}${t(claimable ? 'daily.gift' : 'daily.tomorrow')}</p>
         <div class="stamps">${stamps}</div>
         ${claimable ? `
-          <div class="reward-line">💰 ${fmt(r.coins)} 溫泉幣</div>
-          <div class="reward-line rb">🌈 ${fmt(r.rainbow)} 彩虹金幣</div>
-          <button data-sfx="own" id="claim-btn">領取！</button>
-          <button class="link-btn" id="daily-later">稍後再領</button>`
-        : `<button id="daily-later">好的</button>`}
-        <p style="font-size:.75rem;opacity:.6;margin-top:10px">中斷一天沒登入，會從第 1 天重新開始</p>
+          <div class="reward-line">${t('reward.coins', { n: fmt(r.coins) })}</div>
+          <div class="reward-line rb">${t('reward.rainbow', { n: fmt(r.rainbow) })}</div>
+          <button data-sfx="own" id="claim-btn">${t('daily.claim')}</button>
+          <button class="link-btn" id="daily-later">${t('daily.later')}</button>`
+        : `<button id="daily-later">${t('daily.ok')}</button>`}
+        <p style="font-size:.75rem;opacity:.6;margin-top:10px">${t('daily.note')}</p>
       </div>`;
     document.body.appendChild(dailyBg);
     const close = () => { dailyBg.remove(); dailyBg = null; };
@@ -1684,9 +2335,9 @@
       state.rainbow += r.rainbow;
       state.daily = { last: todayStr(), streak };
       sfx.sparkle();
-      toast(`🎁 領到第 ${day} 天的登入獎勵！`);
+      toast(t('daily.toast', { n: day }));
       const s = slimes[Math.floor(Math.random() * slimes.length)];
-      if (s) say(s, '老闆今天也來了！♡');
+      if (s) say(s, t('daily.say'));
       close(); updateGiftDot(); render(); save();
     };
   }
@@ -1705,53 +2356,43 @@
   }
 
   // ===== 史萊姆 =====
-  const LINES = [
-    '呼～好舒服喔～', '泡到融化了…', '溫度剛剛好♪', '啵嚕啵嚕～',
-    '今天也辛苦了', '想喝牛奶！🥛', '整隻都軟掉了', 'ㄆㄨㄆㄨ～',
-    '再泡五分鐘…', '好想睡喔 zzZ', '這裡是天堂吧', '皮膚變Q彈了！',
-    '要不要一起泡？', '♨ 極樂極樂 ♨',
-  ];
-  const PET_LINES = [
-    '嘿嘿，好癢喔～', '再摸一下嘛♡', '噗嚕噗嚕！', '最喜歡老闆了！',
-    '被發現了～', '嗚哇！嚇一跳', '軟綿綿的吧？', '要一起泡嗎？♡',
-  ];
+  // 史萊姆的閒聊台詞在 I18N 的 'lines'、摸摸台詞在 'petLines'
   const slimes = [];
 
   function slimeCount() { return Math.min(active().colors.length, 2 + Math.floor(activeData().lv / 3)); }
 
   // ===== 史萊姆外觀：名字 / 帽子 / 毛巾 =====
   const HATS = [
-    { id: 'none',       icon: '✖️', name: '不戴',   cost: 0 },
-    { id: 'ribbon',     icon: '🎀', name: '蝴蝶結', cost: 8 },
-    { id: 'flower',     icon: '🌼', name: '小花',   cost: 8 },
-    { id: 'cap',        icon: '🧢', name: '棒球帽', cost: 15 },
-    { id: 'strawberry', icon: '🍓', name: '草莓',   cost: 15 },
-    { id: 'strawhat',   icon: '👒', name: '草帽',   cost: 25 },
-    { id: 'grad',       icon: '🎓', name: '學士帽', cost: 30 },
-    { id: 'crown',      icon: '👑', name: '小皇冠', cost: 60 },
+    { id: 'none',       icon: '✖️', cost: 0 },
+    { id: 'ribbon',     icon: '🎀', cost: 8 },
+    { id: 'flower',     icon: '🌼', cost: 8 },
+    { id: 'cap',        icon: '🧢', cost: 15 },
+    { id: 'strawberry', icon: '🍓', cost: 15 },
+    { id: 'strawhat',   icon: '👒', cost: 25 },
+    { id: 'grad',       icon: '🎓', cost: 30 },
+    { id: 'crown',      icon: '👑', cost: 60 },
   ];
+  localize(HATS, { name: h => 'hat.' + h.id });
   const TOWELS = [
-    { id: 'default',  color: null,      name: '原色', cost: 0 },   // 使用溫泉池預設的毛巾顏色
-    { id: 'none',     color: null,      name: '不戴', cost: 0 },
-    { id: 'pink',     color: '#ffc4d4', name: '粉紅', cost: 5 },
-    { id: 'mint',     color: '#bff0d8', name: '薄荷', cost: 5 },
-    { id: 'sky',      color: '#bfe3ff', name: '天空', cost: 5 },
-    { id: 'lavender', color: '#e0d0ff', name: '薰衣草', cost: 5 },
-    { id: 'lemon',    color: '#fff1a8', name: '檸檬', cost: 5 },
-    { id: 'stripe',   color: 'repeating-linear-gradient(90deg,#fff 0 4px,#7fb3c9 4px 8px)', name: '條紋', cost: 12 },
+    { id: 'default',  color: null,      cost: 0 },   // 使用溫泉池預設的毛巾顏色
+    { id: 'none',     color: null,      cost: 0 },
+    { id: 'pink',     color: '#ffc4d4', cost: 5 },
+    { id: 'mint',     color: '#bff0d8', cost: 5 },
+    { id: 'sky',      color: '#bfe3ff', cost: 5 },
+    { id: 'lavender', color: '#e0d0ff', cost: 5 },
+    { id: 'lemon',    color: '#fff1a8', cost: 5 },
+    { id: 'stripe',   color: 'repeating-linear-gradient(90deg,#fff 0 4px,#7fb3c9 4px 8px)', cost: 12 },
   ];
-  const DEFAULT_NAMES = {
-    forest: ['小綠', '桃桃', '藍藍', '布丁', '葡萄', '橘子'],
-    sakura: ['櫻櫻', '小桃', '莓莓', '奶油', '紫藤', '杏仁'],
-    aurora: ['冰冰', '雪球', '星星', '薰衣', '薄荷', '雲朵'],
-  };
+  localize(TOWELS, { name: tw => 'towel.' + tw.id });
   const lookKey = (poolId, i) => `${poolId}-${i}`;
+  const defaultName = (poolId, i) => t('names.' + poolId)[i];   // 預設名字跟著語言切換
   function getLook(poolId, i) {
+    const raw = state.looks[lookKey(poolId, i)] || {};
     return {
-      name: DEFAULT_NAMES[poolId][i],
       hat: 'none',
       towel: i % 2 === 0 ? 'default' : 'none',
-      ...state.looks[lookKey(poolId, i)],
+      ...raw,
+      name: raw.name || defaultName(poolId, i),
     };
   }
   const escapeHTML = str => String(str).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -1760,7 +2401,7 @@
   function towelColor(look, poolId) {
     if (look.towel === 'none') return null;
     if (look.towel === 'default') return poolDef(poolId).towel;
-    return (TOWELS.find(t => t.id === look.towel) || TOWELS[0]).color || poolDef(poolId).towel;
+    return (TOWELS.find(tw => tw.id === look.towel) || TOWELS[0]).color || poolDef(poolId).towel;
   }
   function hatIcon(look) {
     const h = HATS.find(x => x.id === look.hat);
@@ -1816,8 +2457,9 @@
     void s.el.offsetWidth;  // 重新觸發動畫
     s.el.classList.add('squish');
     sfx.boing();
+    state.stats.pets++;
     const name = getLook(s.poolId, s.index).name;
-    const lines = PET_LINES.concat([`我是${name}！`, `${name}最喜歡老闆了♡`]);
+    const lines = t('petLines').concat([t('say.iam', { name }), t('say.love', { name })]);
     say(s, lines[Math.floor(Math.random() * lines.length)]);
     spawnHearts(s.el, 5);
   }
@@ -1855,7 +2497,7 @@
   }
 
   function say(s, text) {
-    const lines = LINES.concat(active().lines);
+    const lines = t('lines').concat(active().lines);
     s.bubble.textContent = text || lines[Math.floor(Math.random() * lines.length)];
     s.bubble.classList.add('show');
     clearTimeout(s.timer);
@@ -1866,7 +2508,7 @@
     while (slimes.length < slimeCount()) {
       const s = createSlime({ color: active().colors[slimes.length], index: slimes.length });
       slimes.push(s);
-      if (!quiet && slimes.length > 2) say(s, `我是${getLook(s.poolId, s.index).name}，我也來泡湯囉！`);
+      if (!quiet && slimes.length > 2) say(s, t('say.join', { name: getLook(s.poolId, s.index).name }));
     }
     while (slimes.length > slimeCount()) slimes.pop().el.remove();
     renderHouse();
@@ -1875,13 +2517,13 @@
   // ===== 史萊姆之家 & 換裝 =====
   function renderHouse() {
     const def = active();
-    $('house-pool').textContent = `${def.icon} ${def.name}的住客`;
+    $('house-pool').textContent = t('house.guests', { icon: def.icon, pool: def.name });
     $('house').innerHTML = slimes.map(s => {
       const look = getLook(s.poolId, s.index);
       return `<button class="house-card" data-i="${s.index}">
         ${miniSlimeHTML(def.colors[s.index], look, s.poolId)}
         <div class="hname">${escapeHTML(look.name)}</div>
-        <div class="hedit">✏️ 取名・換裝</div>
+        <div class="hedit">${t('house.edit')}</div>
       </button>`;
     }).join('');
   }
@@ -1895,7 +2537,9 @@
 
   function setLook(patch) {
     const key = lookKey(dressing.poolId, dressing.index);
-    state.looks[key] = { ...getLook(dressing.poolId, dressing.index), ...patch };
+    const raw = { ...state.looks[key], ...patch };
+    if (!raw.name) delete raw.name;          // 沒有自己取名 → 不存，顯示目前語言的預設名字
+    state.looks[key] = raw;
     applyLook(dressing);
     renderDress();
     renderHouse();
@@ -1914,10 +2558,10 @@
       </button>`;
     $('wardrobe-hats').innerHTML = HATS.map(h => item('hat', h, look.hat === h.id,
       h.cost === 0 || state.wardrobe.hats.includes(h.id), `<span class="wi">${h.icon}</span>`)).join('');
-    $('wardrobe-towels').innerHTML = TOWELS.map(t => {
-      const c = t.id === 'default' ? poolDef(s.poolId).towel : t.color;
+    $('wardrobe-towels').innerHTML = TOWELS.map(tw => {
+      const c = tw.id === 'default' ? poolDef(s.poolId).towel : tw.color;
       const sw = c ? `<span class="swatch" style="background:${c}"></span>` : '<span class="wi">✖️</span>';
-      return item('towel', t, look.towel === t.id, t.cost === 0 || state.wardrobe.towels.includes(t.id), sw);
+      return item('towel', tw, look.towel === tw.id, tw.cost === 0 || state.wardrobe.towels.includes(tw.id), sw);
     }).join('');
   }
 
@@ -1932,8 +2576,8 @@
   function closeDress() {
     if (!dressing) return;
     const name = $('dress-name').value.trim();
-    setLook({ name: name || DEFAULT_NAMES[dressing.poolId][dressing.index] });
-    say(dressing, `${getLook(dressing.poolId, dressing.index).name}覺得很開心♡`);
+    setLook({ name: name && name !== defaultName(dressing.poolId, dressing.index) ? name : '' });
+    say(dressing, t('dress.happy', { name: getLook(dressing.poolId, dressing.index).name }));
     spawnHearts(dressing.el, 5);
     dressing = null;
     dressBg.hidden = true;
@@ -1954,13 +2598,13 @@
     if (it.cost > 0 && !owned.includes(id)) {
       if (state.rainbow < it.cost) {
         sfx.tick();
-        $('dress-msg').textContent = `彩虹金幣不夠喔～還差 🌈${fmt(it.cost - state.rainbow)}`;
+        $('dress-msg').textContent = t('dress.short', { n: fmt(it.cost - state.rainbow) });
         return;
       }
       state.rainbow -= it.cost;
       owned.push(id);
       sfx.ding();
-      $('dress-msg').textContent = `買到了「${it.name}」！所有史萊姆都可以穿喔`;
+      $('dress-msg').textContent = t('dress.bought', { name: it.name });
     } else {
       sfx.pop();
       $('dress-msg').textContent = '';
@@ -1972,9 +2616,10 @@
   // ===== 多重溫泉池：分頁、切換、解鎖 =====
   $('pool-tabs').innerHTML = POOLS.map(p => `
     <button class="tab" id="tab-${p.id}" data-pool="${p.id}">
-      <b>${p.icon} ${p.name}</b>
+      <b id="tabname-${p.id}"></b>
       <small id="tabinfo-${p.id}"></small>
     </button>`).join('');
+  const renderTabNames = () => POOLS.forEach(p => { $('tabname-' + p.id).textContent = `${p.icon} ${p.name}`; });
   $('pool-tabs').addEventListener('click', e => {
     const tab = e.target.closest('.tab');
     if (tab && tab.dataset.pool !== state.activePool) switchPool(tab.dataset.pool);
@@ -1991,15 +2636,17 @@
 
     const locked = !activeData().unlocked;
     $('lock-overlay').hidden = !locked;
-    if (locked) {
-      $('lock-icon').textContent = def.icon;
-      $('lock-name').textContent = def.name;
-      $('lock-desc').textContent =
-        `解鎖後每秒 +${fmt(def.base * multiplier())} 溫泉幣、每次撈取 +${fmt(def.clickBase)}，還會有新的史萊姆入住！`;
-    } else if (slimes[0]) {
-      say(slimes[0], def.lines[0]);
-    }
+    if (locked) renderLock();
+    else if (slimes[0]) say(slimes[0], def.lines[0]);
     render();
+  }
+  // 未解鎖溫泉池的說明（切換語言時也會呼叫）
+  function renderLock() {
+    const def = active();
+    $('lock-icon').textContent = def.icon;
+    $('lock-name').textContent = def.name;
+    $('lock-desc').textContent =
+      t('unlock.desc', { ps: fmt(def.base * multiplier()), pc: fmt(def.clickBase) });
   }
 
   $('unlock-btn').addEventListener('click', () => {
@@ -2009,8 +2656,8 @@
     data.unlocked = true;
     sfx.sparkle();
     switchPool(def.id);
-    toast(`🎉 ${def.name} 開幕了！`);
-    if (slimes[1]) say(slimes[1], '新溫泉耶！衝啊～');
+    toast(t('unlock.toast', { pool: def.name }));
+    if (slimes[1]) say(slimes[1], t('unlock.say'));
     save();
   });
 
@@ -2057,15 +2704,14 @@
 
   // ===== 季節活動（依照玩家電腦 / 手機的日期自動切換）=====
   const SEASON_INFO = {
-    spring: { label: '🌸 春季限定：糰子史萊姆出沒中！',     when: '春天（3～5 月）',
-              fx: { chars: ['🌸', '✿'], n: 6, color: '#ffb7c9' } },
-    summer: { label: '🎐 夏季限定：西瓜史萊姆出沒中！',     when: '夏天（6～8 月）', fx: 'firefly' },
-    autumn: { label: '🍁 秋季限定：楓葉史萊姆出沒中！',     when: '秋天（9～11 月）',
-              fx: { chars: ['🍁', '🍂'], n: 7 } },
-    winter: { label: '⛄ 冬季限定：雪人史萊姆出沒中！',     when: '冬天（12～2 月）',
-              fx: { chars: ['❄', '❅'], n: 10, color: '#ffffff' } },
-    xmas:   { label: '🎄 聖誕限定：聖誕帽史萊姆出沒中！',   when: '聖誕節（12/1～12/25）' },
+    spring: { fx: { chars: ['🌸', '✿'], n: 6, color: '#ffb7c9' } },
+    summer: { fx: 'firefly' },
+    autumn: { fx: { chars: ['🍁', '🍂'], n: 7 } },
+    winter: { fx: { chars: ['❄', '❅'], n: 10, color: '#ffffff' } },
+    xmas:   {},
   };
+  for (const [k, v] of Object.entries(SEASON_INFO)) v.id = k;
+  localize(Object.values(SEASON_INFO), { label: v => `season.${v.id}.label`, when: v => `season.${v.id}.when` });
   // 回傳目前有效的季節標籤，例如 ['autumn'] 或 ['winter', 'xmas']
   // 測試用：網址加上 ?season=spring / summer / autumn / winter / xmas 可以強制切換
   function detectSeasons() {
@@ -2079,9 +2725,11 @@
   }
   const SEASONS = detectSeasons();
 
+  const renderSeasonBadge = () => {
+    $('season-badge').textContent = SEASON_INFO[SEASONS.includes('xmas') ? 'xmas' : SEASONS[0]].label;
+  };
   function setupSeason() {
-    const info = SEASON_INFO[SEASONS.includes('xmas') ? 'xmas' : SEASONS[0]];
-    $('season-badge').textContent = info.label;
+    renderSeasonBadge();
     $('season-badge').hidden = false;
 
     // 季節飄落物，所有溫泉池都看得到
@@ -2112,33 +2760,37 @@
 
   // ===== 稀有史萊姆 =====
   const RARE_TYPES = [
-    { id: 'gold',    name: '金幣史萊姆',   hat: '🎩', color: '#ffd54a', weight: 55, rarity: '★',
-      hello: '撿到我會發財喔！', reward: () => ({ coins: Math.max(50, perSecond() * 60) }) },
-    { id: 'rainbow', name: '彩虹史萊姆',   hat: '🌈', weight: 25, rarity: '★★',
+    { id: 'gold',    hat: '🎩', color: '#ffd54a', weight: 55, stars: '★',
+      reward: () => ({ coins: Math.max(50, perSecond() * 60) }) },
+    { id: 'rainbow', hat: '🌈', weight: 25, stars: '★★',
       color: 'linear-gradient(135deg,#ffb3ba,#ffdfba,#ffffba,#baffc9,#bae1ff,#d7baff)',
-      hello: '七彩的泡泡～', reward: () => ({ rainbow: Math.max(3, rainbowPerSecond() * 120) }) },
-    { id: 'sakura',  name: '櫻花史萊姆',   hat: '🌸', color: '#ffd1dc', weight: 15, rarity: '★★★',
-      hello: '春天來泡湯了♪', reward: () => ({ coins: Math.max(100, perSecond() * 120), rainbow: 2 }) },
-    { id: 'king',    name: '國王史萊姆',   hat: '👑', color: '#b9a3f0', weight: 5, rarity: '★★★★',
-      hello: '本王駕到！', reward: () => ({ coins: Math.max(500, perSecond() * 300), rainbow: 10 }) },
+      reward: () => ({ rainbow: Math.max(3, rainbowPerSecond() * 120) }) },
+    { id: 'sakura',  hat: '🌸', color: '#ffd1dc', weight: 15, stars: '★★★',
+      reward: () => ({ coins: Math.max(100, perSecond() * 120), rainbow: 2 }) },
+    { id: 'king',    hat: '👑', color: '#b9a3f0', weight: 5, stars: '★★★★',
+      reward: () => ({ coins: Math.max(500, perSecond() * 300), rainbow: 10 }) },
 
     // ----- 季節限定（只在對應季節出現，不影響常駐圖鑑成就）-----
-    { id: 'dango', season: 'spring', name: '糰子史萊姆', hat: '🍡', weight: 30, rarity: '春季限定',
+    { id: 'dango', season: 'spring', hat: '🍡', weight: 30,
       color: 'linear-gradient(180deg,#ffc9d9 0 34%,#fff6e0 34% 67%,#c9ecb4 67%)',
-      hello: '三色糰子來泡湯～', reward: () => ({ coins: Math.max(300, perSecond() * 180), rainbow: 5 }) },
-    { id: 'watermelon', season: 'summer', name: '西瓜史萊姆', hat: '🍉', weight: 30, rarity: '夏季限定',
+      reward: () => ({ coins: Math.max(300, perSecond() * 180), rainbow: 5 }) },
+    { id: 'watermelon', season: 'summer', hat: '🍉', weight: 30,
       color: 'linear-gradient(180deg,#ff8f9c 0 74%,#8fd18f 74%)',
-      hello: '夏天就是要吃西瓜！', reward: () => ({ coins: Math.max(300, perSecond() * 180), rainbow: 5 }) },
-    { id: 'maple', season: 'autumn', name: '楓葉史萊姆', hat: '🍁', weight: 30, rarity: '秋季限定',
+      reward: () => ({ coins: Math.max(300, perSecond() * 180), rainbow: 5 }) },
+    { id: 'maple', season: 'autumn', hat: '🍁', weight: 30,
       color: '#ffb36b',
-      hello: '秋天的楓葉好漂亮～', reward: () => ({ coins: Math.max(300, perSecond() * 180), rainbow: 5 }) },
-    { id: 'snowman', season: 'winter', name: '雪人史萊姆', hat: '⛄', weight: 30, rarity: '冬季限定',
+      reward: () => ({ coins: Math.max(300, perSecond() * 180), rainbow: 5 }) },
+    { id: 'snowman', season: 'winter', hat: '⛄', weight: 30,
       color: '#f4fbff',
-      hello: '泡湯不會融化吧…？', reward: () => ({ coins: Math.max(300, perSecond() * 180), rainbow: 5 }) },
-    { id: 'santa', season: 'xmas', name: '聖誕帽史萊姆', hat: 'santa', weight: 25, rarity: '聖誕限定',
+      reward: () => ({ coins: Math.max(300, perSecond() * 180), rainbow: 5 }) },
+    { id: 'santa', season: 'xmas', hat: 'santa', weight: 25,
       color: '#ffb3b8',
-      hello: 'Merry Christmas！🎄', reward: () => ({ coins: Math.max(500, perSecond() * 300), rainbow: 12 }) },
+      reward: () => ({ coins: Math.max(500, perSecond() * 300), rainbow: 12 }) },
   ];
+  localize(RARE_TYPES, { name: r => `rare.${r.id}.name`, hello: r => `rare.${r.id}.hello` });
+  // 稀有度：常駐的用星星（不用翻譯），季節限定的顯示「春季限定」等文字
+  RARE_TYPES.forEach(r => Object.defineProperty(r, 'rarity', {
+    get: () => r.season ? t('rarity.' + r.season) : r.stars, enumerable: true }));
   const isAvailable = t => !t.season || SEASONS.includes(t.season);
   const RARE_STAY_MS = 12000;     // 停留時間
   const RARE_CHANCE = 1 / 45;     // 每秒出現機率（平均約 45 秒一隻）
@@ -2165,10 +2817,10 @@
     const s = createSlime({ color: type.color, hat: type.hat, rare: true });
     s.type = type;
     s.el.addEventListener('click', e => { e.stopPropagation(); catchRare(s); });
-    s.leaveTimer = setTimeout(() => { say(s, '掰掰～'); removeRare(s); }, RARE_STAY_MS);
+    s.leaveTimer = setTimeout(() => { say(s, t('rare.bye')); removeRare(s); }, RARE_STAY_MS);
     rare = s;
     say(s, type.hello);
-    toast(`✨ ${type.name}出現了！快點牠！`);
+    toast(t('rare.appear', { name: type.name }));
   }
 
   function catchRare(s) {
@@ -2188,8 +2840,8 @@
     if (r.rainbow) parts.push('🌈+' + fmt(r.rainbow));
     floatText(x, y, parts.join(' '));
     spawnHearts(s.el, 8);
-    say(s, '謝謝光臨♡');
-    toast(isNew ? `📖 新發現：${s.type.name}！` : `${s.type.name}（第 ${state.dex[s.type.id]} 次）`);
+    say(s, t('rare.thanks'));
+    toast(isNew ? t('rare.new', { name: s.type.name }) : t('rare.again', { name: s.type.name, n: state.dex[s.type.id] }));
     removeRare(s);
     renderDex(); render(); save();
   }
@@ -2202,23 +2854,22 @@
   }
 
   function renderDex() {
-    $('dex').innerHTML = RARE_TYPES.map(t => {
-      const n = state.dex[t.id] || 0;
-      const avail = isAvailable(t);
-      const status = n ? `已遇見 ${n} 次`
-        : t.season ? (avail ? '出沒中！快找找' : `${SEASON_INFO[t.season].when}出現`)
-        : '尚未發現';
+    $('dex').innerHTML = RARE_TYPES.map(r => {   // 變數不能叫 t，會蓋掉翻譯函式 t()
+      const n = state.dex[r.id] || 0;
+      const avail = isAvailable(r);
+      const status = n ? t('dex.seen', { n })
+        : r.season ? (avail ? t('dex.active') : t('dex.when', { when: SEASON_INFO[r.season].when }))
+        : t('dex.unknown');
       return `
-        <div class="dex-card ${n ? '' : 'locked'} ${t.season && !avail ? 'off-season' : ''}">
-          ${t.season ? '<span class="limited">季節限定</span>' : ''}
-          <div class="pic" style="--c:${t.color}"><span>${hatHTML(t.hat)}</span></div>
-          <div class="dname">${n ? t.name : '？？？'}</div>
-          <div class="rarity">${t.rarity}</div>
+        <div class="dex-card ${n ? '' : 'locked'} ${r.season && !avail ? 'off-season' : ''}">
+          ${r.season ? `<span class="limited">${t('dex.limited')}</span>` : ''}
+          <div class="pic" style="--c:${r.color}"><span>${hatHTML(r.hat)}</span></div>
+          <div class="dname">${n ? r.name : '？？？'}</div>
+          <div class="rarity">${r.rarity}</div>
           <div class="count">${status}</div>
         </div>`;
     }).join('');
-    $('dex-found').textContent = RARE_TYPES.filter(t => state.dex[t.id]).length;
-    $('dex-total').textContent = RARE_TYPES.length;
+    $('dex-count').textContent = t('dex.count', { a: RARE_TYPES.filter(r => state.dex[r.id]).length, b: RARE_TYPES.length });
   }
 
   // ===== 小鴨 =====
@@ -2252,6 +2903,10 @@
     const rainbowGain = rainbowPerSecond() * away;
     earn(gain);
     state.rainbow += rainbowGain;
+    // 發完就把計時歸零，同一段時間才不會被發兩次（例如教學結束時分頁剛好在背景）
+    state.lastSeen = Date.now();
+    if (hiddenSince) hiddenSince = state.lastSeen;
+    save();
     showOfflineModal(away, gain, rainbowGain, onClose);
     return true;
   }
@@ -2262,27 +2917,176 @@
     bg.innerHTML = `
       <div class="modal">
         <div class="big">🌙♨️</div>
-        <h3>歡迎回來！</h3>
-        <p>你離開了 ${fmtTime(sec)}${sec >= OFFLINE_CAP_SEC ? '（最多計算 8 小時）' : ''}</p>
-        <p>史萊姆們幫你顧店，賺到了：</p>
-        <div class="gain">💰 ${fmt(gain)} 溫泉幣</div>
-        ${rainbowGain > 0 ? `<div class="gain" style="color:#b77ad6;font-size:1.2rem">🌈 ${fmt(rainbowGain)} 彩虹金幣</div>` : ''}
-        <button>收下！</button>
+        <h3>${t('off.title')}</h3>
+        <p>${t('off.away', { t: fmtTime(sec) })}${sec >= OFFLINE_CAP_SEC ? t('off.cap') : ''}</p>
+        <p>${t('off.earned')}</p>
+        <div class="gain">${t('reward.coins', { n: fmt(gain) })}</div>
+        ${rainbowGain > 0 ? `<div class="gain" style="color:#b77ad6;font-size:1.2rem">${t('reward.rainbow', { n: fmt(rainbowGain) })}</div>` : ''}
+        <button>${t('off.ok')}</button>
       </div>`;
     document.body.appendChild(bg);
     bg.querySelector('button').onclick = () => { bg.remove(); if (onClose) onClose(); };
   }
 
+  // ===== 多語言：套用到畫面 =====
+  // HTML 上的 data-i18n（文字）、data-i18n-html（含 <b> 等標籤）、data-i18n-attr（"屬性1,屬性2:key"）
+  function applyStaticText() {
+    document.documentElement.lang = HTML_LANG[lang];
+    document.title = t('title');
+    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+    document.querySelectorAll('[data-i18n-attr]').forEach(el => {
+      const [attrs, key] = el.dataset.i18nAttr.split(':');
+      attrs.split(',').forEach(a => el.setAttribute(a, t(key)));
+    });
+    $('lang-btns').innerHTML = LANGS.map(([id, label]) =>
+      `<button class="mini-btn ${id === lang ? 'on' : ''}" data-lang="${id}">${label}</button>`).join('');
+  }
+
+  function setLang(l) {
+    if (!I18N[l]) return;
+    lang = l;
+    try { localStorage.setItem(LANG_KEY, l); } catch (e) {}
+    applyStaticText();
+    // 設定視窗裡依狀態變化的文字
+    disarmReset();
+    $('save-panel').hidden = true;
+    if (!settingsBg.hidden) openSettings();
+    // 遊戲畫面
+    renderTabNames();
+    renderSeasonBadge();
+    lanternShown = -1;                     // 讓溫泉祭區塊重寫
+    if (!activeData().unlocked) renderLock();
+    slimes.forEach(s => applyLook(s));     // 名牌（預設名字會換成新語言）
+    renderHouse(); renderDex(); renderAch(); render();
+    if (dressing) renderDress();
+    updateMusicBtn();
+    if (tut) showTutStep();
+  }
+
+  // ===== 新手教學 =====
+  // 依序把畫面上的區塊打亮並說明；教學中擋住遊戲畫面，避免誤點。
+  const TUT_STEPS = [
+    { key: 'welcome', target: null, langs: true },
+    { key: 'pool',  target: () => document.querySelector('.pool-frame') },
+    { key: 'stats', target: () => document.querySelector('.stats') },
+    { key: 'shop',  target: () => document.querySelector('.shop') },
+    { key: 'tabs',  target: () => $('pool-tabs') },
+    { key: 'house', target: () => $('house') },
+    { key: 'top',   target: () => document.querySelector('.top-btns'), fixed: true },
+  ];
+  let tut = null;   // 進行中的教學：{ step, layer, spot, card, raf, onDone }
+
+  function startTutorial(onDone) {
+    if (tut) return;
+    const layer = document.createElement('div');
+    layer.className = 'tut-layer';
+    layer.innerHTML = '<div class="tut-spot none"></div><div class="tut-card"></div>';
+    document.body.appendChild(layer);
+    tut = { step: 0, layer, spot: layer.querySelector('.tut-spot'), card: layer.querySelector('.tut-card'), raf: 0, onDone };
+    layer.addEventListener('click', e => {
+      const b = e.target.closest('button');
+      if (!b || !tut) return;
+      if (b.dataset.lang) { if (b.dataset.lang !== lang) setLang(b.dataset.lang); return; }
+      if (b.classList.contains('tut-skip')) return endTutorial();
+      if (b.classList.contains('tut-next')) {
+        if (tut.step < TUT_STEPS.length - 1) { tut.step++; showTutStep(true); }
+        else endTutorial();
+      }
+    });
+    showTutStep(true);
+    tutLoop();
+    window.addEventListener('scroll', placeTut, { passive: true });
+    window.addEventListener('resize', placeTut);
+  }
+
+  function showTutStep(scroll) {
+    const st = TUT_STEPS[tut.step], last = tut.step === TUT_STEPS.length - 1;
+    tut.card.innerHTML = `
+      ${st.target ? '' : '<div class="tut-slime">♨️</div>'}
+      <h3>${t('tut.' + st.key + 'Title')}</h3>
+      <p>${t('tut.' + st.key)}</p>
+      ${st.langs ? `<div class="tut-langs">${LANGS.map(([id, label]) =>
+        `<button data-lang="${id}" class="${id === lang ? 'on' : ''}">${label}</button>`).join('')}</div>` : ''}
+      <div class="tut-foot">
+        <button class="tut-skip" ${last ? 'style="visibility:hidden"' : ''}>${t('tut.skip')}</button>
+        <span class="tut-step">${tut.step + 1} / ${TUT_STEPS.length}</span>
+        <button class="tut-next">${t(last ? 'tut.start' : 'tut.next')}</button>
+      </div>`;
+    const el = st.target && st.target();
+    if (scroll && el && !st.fixed) {
+      // 目標＋說明卡放得進一個畫面 → 兩個一起置中（卡片在下方）；放不下 → 目標置中，卡片貼底
+      const r = el.getBoundingClientRect(), ch = tut.card.offsetHeight, vh = window.innerHeight;
+      const total = r.height + 16 + 12 + ch;          // 目標 + 打亮框的邊距 + 間隔 + 卡片
+      const want = total <= vh - 16 ? (vh - total) / 2 + 8 : (vh - r.height) / 2;
+      window.scrollTo({ top: window.scrollY + r.top - want, behavior: 'smooth' });
+    }
+    placeTut();
+  }
+
+  // 每一格畫面都重新對齊；另外在捲動、旋轉手機、視窗縮放時也會立刻對齊
+  function tutLoop() {
+    if (!tut) return;
+    placeTut();
+    tut.raf = requestAnimationFrame(tutLoop);
+  }
+  function placeTut() {
+    if (!tut) return;
+    const st = TUT_STEPS[tut.step], el = st.target && st.target();
+    const { spot, card } = tut;
+    const vw = window.innerWidth, vh = window.innerHeight, pad = 8, gap = 12;
+    const cw = card.offsetWidth, ch = card.offsetHeight;
+    let left, top;
+    tut.layer.classList.toggle('dim', !el);
+    if (!el) {
+      spot.classList.add('none');
+      left = (vw - cw) / 2;
+      top = (vh - ch) / 2;
+    } else {
+      spot.classList.remove('none');
+      const r = el.getBoundingClientRect();
+      Object.assign(spot.style, {
+        left: r.left - pad + 'px', top: r.top - pad + 'px',
+        width: r.width + pad * 2 + 'px', height: r.height + pad * 2 + 'px',
+      });
+      // 說明卡放在目標下方；放不下就放上方；都放不下（目標太高）就貼在畫面底部
+      if (r.bottom + pad + gap + ch <= vh - 8) top = r.bottom + pad + gap;
+      else if (r.top - pad - gap - ch >= 8) top = r.top - pad - gap - ch;
+      else top = vh - ch - 12;
+      left = r.left + r.width / 2 - cw / 2;
+    }
+    left = Math.min(Math.max(16, left), vw - cw - 16);
+    Object.assign(card.style, { left: left + 'px', top: Math.max(8, top) + 'px' });
+  }
+
+  function endTutorial() {
+    if (!tut) return;
+    cancelAnimationFrame(tut.raf);
+    window.removeEventListener('scroll', placeTut);
+    window.removeEventListener('resize', placeTut);
+    tut.layer.remove();
+    const done = tut.onDone;
+    tut = null;
+    state.tutorial = true;
+    save();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (done) done();
+  }
+
   // ===== 初始化 =====
   const saved = load();
   if (saved) state = saved;
+  applyStaticText();
+  renderTabNames();
   setupSeason();
   switchPool(state.activePool);
   syncDucks();
   renderDex();
   render();
-  // 先顯示離線收益，收下後再跳出每日獎勵
-  if (!(saved && grantOffline(maybeShowDaily))) maybeShowDaily();
+  // 新玩家：先看教學，看完再跳每日獎勵；老玩家：先顯示離線收益，收下後再跳出每日獎勵
+  const showWelcomeModals = () => { if (!(saved && grantOffline(maybeShowDaily))) maybeShowDaily(); };
+  if (!state.tutorial) startTutorial(showWelcomeModals);
+  else showWelcomeModals();
   updateGiftDot();
   checkAchievements();
   save();
@@ -2308,14 +3112,15 @@
   setInterval(save, 5000);
   setInterval(checkAchievements, 1000);   // 購買、捕獲、解鎖後一秒內就會跳出成就
   setInterval(() => {
-    if (!rare && !document.hidden && activeData().unlocked && Math.random() < RARE_CHANCE) spawnRare();
+    if (!rare && !tut && !document.hidden && activeData().unlocked && Math.random() < RARE_CHANCE) spawnRare();
   }, 1000);
 
   // 分頁切走後回來：補發這段時間的收益
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { hiddenSince = Date.now(); save(); return; }
     hiddenSince = null;
-    if (!grantOffline(maybeShowDaily)) maybeShowDaily();   // 隔天切回來也能領每日獎勵
+    // 隔天切回來也能領每日獎勵；教學進行中先不跳（教學結束時會自己跳出來）
+    if (!tut && !grantOffline(maybeShowDaily)) maybeShowDaily();
     updateGiftDot();
     last = performance.now();
     save();
@@ -2331,14 +3136,15 @@
   let musicOn = true;       // 玩家的偏好（預設開啟，會記住）
   let musicMissing = false;
   try { musicOn = localStorage.getItem(MUSIC_KEY) !== 'off'; } catch (e) {}
-  bgm.volume = 0.35;
+  bgm.volume = bgmVolume();   // 注意：iPhone / iPad 的 Safari 不允許網頁調整音量，只能開關
 
   function updateMusicBtn() {
     const playing = !bgm.paused;
     musicBtn.classList.toggle('playing', playing);
     musicBtn.classList.toggle('off', !musicOn);
     musicBtn.classList.toggle('waiting', musicMissing || (musicOn && !playing));
-    musicBtn.title = musicMissing ? '找不到 bgm.mp3' : (playing ? '暫停音樂' : '播放音樂');
+    musicBtn.title = t(musicMissing ? 'music.missing' : (playing ? 'music.pause' : 'music.play'));
+    musicBtn.querySelector('.label').textContent = t(musicMissing ? 'music.missing' : 'music.tapToStart');
   }
   function setMusicPref(on) {
     musicOn = on;
@@ -2370,7 +3176,6 @@
   bgm.addEventListener('pause', updateMusicBtn);
   bgm.addEventListener('error', () => {
     musicMissing = true;
-    musicBtn.querySelector('.label').textContent = '找不到 bgm.mp3';
     updateMusicBtn();
   });
 
